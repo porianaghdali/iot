@@ -57,9 +57,7 @@ export default function SideBar({ isOpen }) {
               className=""
             />
             <p
-              className={`font-normal truncate whitespace-nowrap transition-all delay-350 text-base duration-300 ${
-                isOpen ? "" : "hidden"
-              }`}
+              className={`font-normal truncate whitespace-nowrap transition-all delay-350 text-base duration-300 `}
             >
               {item.title}
             </p>
@@ -84,9 +82,7 @@ export default function SideBar({ isOpen }) {
             className=""
           />{" "}
           <p
-            className={`font-normal truncate whitespace-nowrap transition-all delay-350 text-base duration-300 ${
-              isOpen ? "" : "hidden"
-            }`}
+            className={`font-normal truncate whitespace-nowrap transition-all delay-350 text-base duration-300 `}
           >
             تنظیمات
           </p>
@@ -108,9 +104,7 @@ export default function SideBar({ isOpen }) {
             className=""
           />
           <p
-            className={`font-normal truncate whitespace-nowrap transition-all delay-350 text-base duration-300 ${
-              isOpen ? "" : "hidden"
-            }`}
+            className={`font-normal truncate whitespace-nowrap transition-all delay-350 text-base duration-300 `}
           >
             راهنما
           </p>
