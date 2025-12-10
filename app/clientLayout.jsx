@@ -25,12 +25,12 @@ export default function ClientLayout({ children }) {
   }
 
   return (
-    <div>
+    <div className="h-screen">
       <Header toggleSidebar={() => setIsOpen(!isOpen)} />
 
       <div className="flex">
         <Sidebar isOpen={isOpen} />
-        <div className=" w-full h-[calc(100vh-64px)] overflow-auto">
+        <div className=" w-full  ">
           {children}
         </div>
       </div>

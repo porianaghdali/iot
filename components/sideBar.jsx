@@ -80,7 +80,7 @@ export default function SideBar({ isOpen }) {
             width={24}
             height={24}
             className=""
-          />{" "}
+          /> 
           <p
             className={`font-normal truncate whitespace-nowrap transition-all delay-350 text-base duration-300 `}
           >

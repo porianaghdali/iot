@@ -50,7 +50,7 @@ export default function Areas() {
             <span className="flex gap-[1px]">
               <span className="w-3.5 h-1.5 bg-[#FF4646]"></span>
               <span className="w-3.5 h-1.5 bg-[#5921FF]"></span>
-            </span>{" "}
+            </span> 
             <p className="text-[#0D0D0D] text-sm font-normal">{item.status}</p>
           </div>
         </div>

@@ -49,7 +49,7 @@ export default function Systems() {
           <div key={item.id} className="flex items-center justify-between py-2 border-b border-[#F4F4F4]">
             <p className="text-[#0D0D0D] text-sm font-normal">{item.title}</p>
             <div className="flex items-center gap-2">
-              {" "}
+               
               <p className="text-[#0D0D0D] text-sm font-normal">
                 {item.status}%
               </p>
@@ -61,7 +61,7 @@ export default function Systems() {
                   className={`bg-[#20E080] h-1.5 `}
                   style={{ width: `${item.status}%` }}
                 ></span>
-              </span>{" "}
+              </span> 
             </div>
           </div>
         ))}

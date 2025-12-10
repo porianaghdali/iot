@@ -39,8 +39,8 @@ export default function Alert() {
     },
   ];
   return (
-    <div className=" p-3 bg-white rounded-xs flex flex-col gap-3">
-      {" "}
+    <div className=" p-3 bg-white rounded-xs flex flex-col gap-3 ">
+       
       <div className="flex justify-between items-center text-[#2A2A2A]">
         <p className=" text-sm font-normal "> هشدارها</p>
         <div className="flex items-center gap-2">

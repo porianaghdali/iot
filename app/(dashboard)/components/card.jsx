@@ -10,7 +10,7 @@ export default function Card() {
         <div className="grid gap-2.5">
           <p className="text-[#2A2A2A] font-normal text-xs ">اتاق سرور</p>
           <p className=" text-[#606060] font-normal text-[10px]">
-            لورم ایپسوم متن ساختگی{" "}
+            لورم ایپسوم متن ساختگی 
           </p>
         </div>
       </div>

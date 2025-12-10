@@ -3,10 +3,10 @@ import Image from "next/image";
 
 export default function Header({ toggleSidebar }) {
   return (
-    <div className="shadow-[0px_2px_4px_1px_#0000001F] h-16 bg-white p-4 flex justify-between relative z-10">
+    <div className="shadow-[0px_2px_4px_1px_#0000001F] h-16 bg-white p-4 flex justify-between relative z-10 ">
       <div className="flex items-center gap-6">
         <button onClick={toggleSidebar}>
-          {" "}
+           
           <Menu />
           
         </button>

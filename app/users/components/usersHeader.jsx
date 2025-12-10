@@ -1,20 +1,20 @@
 "use client";
 import { useState } from "react";
-
-export default function MonitoringHeader() {
+import { Plus } from "lucide-react";
+export default function UsersHeader() {
   const [selected, setSelected] = useState(1);
   const list = [
-    { id: 1, title: " نمای کلی" },
-    { id: 2, title: "  نقشه" },
-    { id: 3, title: "   ناحیه 1" },
-    { id: 4, title: "    ناحیه 2 " },
+    { id: 1, title: "  همه" },
+    { id: 2, title: "  مدیران" },
+    { id: 3, title: "   ناظران" },
   ];
   return (
     <>
       <div className="p-4 flex justify-between items-center w-full  bg-white">
-        <p className="font-normal text-lg text-[#0D0D0D]  ">مانیتورینگ</p>
-        <button className="font-normal text-sm text-[#0d0d0d]  bg-[#0202020D] px-5 py-1.5 rounded-[50px]">
-          نمای جدید
+        <p className="font-normal text-lg text-[#0D0D0D]  ">کاربران</p>
+        <button className="font-normal text-sm text-[#0d0d0d]  bg-[#0202020D] px-5 py-1.5 rounded-[50px] flex items-center">
+          <Plus/>
+          اضافه کردن{" "}
         </button>
       </div>
       <div
@@ -32,7 +32,7 @@ export default function MonitoringHeader() {
                   : "border-b-2 pb-4 border-transparent"
               }
             >
-              {item.title} 
+              {item.title}
             </button>
           );
         })}

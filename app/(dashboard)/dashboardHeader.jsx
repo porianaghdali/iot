@@ -9,15 +9,21 @@ export default function DashboardHeader() {
     { id: 3, title: "  داشبورد ۳" },
   ];
   return (
-    <div className="w-full bg-white">
-      <div className="p-4 flex justify-between items-center w-full ">
+    <>
+
+
+      
+      <div className="p-4 flex justify-between items-center w-full bg-white">
         <p className="font-normal text-lg text-[#0D0D0D]  ">داشبورد</p>
         <button className="font-normal text-sm text-[#0d0d0d]  bg-[#0202020D] px-5 py-1.5 rounded-[50px]">
           داشبورد جدید
         </button>
       </div>
+
+
+
       <div
-        className="p-4 pb-0 flex gap-6 items-center w-full font-normal text-sm text-[#0d0d0d]"
+        className="p-4 pb-0 flex gap-6 items-center w-full font-normal text-sm text-[#0d0d0d]   sticky top-0  bg-white z-10 "
         style={{ borderBottom: " 1px solid rgba(0, 0, 0, 0.2)" }}
       >
         {list.map((item) => {
@@ -30,13 +36,13 @@ export default function DashboardHeader() {
                   ? "border-b-2 pb-4 border-[#2A2A2A] "
                   : "border-b-2 pb-4 border-transparent"}
             >
-              {item.title}{" "}
+              {item.title} 
             </button>
           );
         })}
 
     
       </div>
-    </div>
+    </>
   );
 }

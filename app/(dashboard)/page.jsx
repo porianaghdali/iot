@@ -8,14 +8,14 @@ import Card from "./components/card";
 import Create from "./components/create";
 export default function Home() {
   return (
-    <div className="w-full bg-[#F5F5F7] ">
+    <div className="w-full bg-[#F5F5F7] h-[calc(100vh-64px)] overflow-auto">
       <DashboardHeader />
-      <div className="p-4 flex gap-1.5 w-full">
+      <div className="p-4 flex gap-1.5 w-full ">
         <div className="flex flex-col gap-1.5">
           <Areas />
           <ServerRoom />
         </div>
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5 ">
           <SoftwareRoom />
           <Systems />
           <Card />

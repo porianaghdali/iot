@@ -36,7 +36,7 @@ export default function ServerRoom() {
 
       <div className="flex items-center justify-between">
         <p className="text-[#2A2A2A] text-base font-normal">
-          {" "}
+           
           44 درجه سانتی گراد
         </p>
       </div>

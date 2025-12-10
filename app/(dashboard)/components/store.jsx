@@ -34,25 +34,25 @@ export default function Store() {
         <div key={item.id} className="flex items-center justify-between">
           <p className="text-[#0D0D0D] text-sm font-normal">{item.title}</p>
           <div className="flex items-center gap-2">
-            {" "}
+             
             <p className="text-[#0D0D0D] text-sm font-normal">{item.status}%</p>
             <span dir="ltr" className="flex gap-[1px] h-1.5 bg-[#F4F4F4] w-20">
               <span
                 className={`bg-[#20E080] h-1.5 `}
                 style={{ width: `${item.status}%` }}
               ></span>
-            </span>{" "}
+            </span> 
           </div>
         </div>
       ))}
       <div className="grid grid-cols-2 gap-2">
         <div className=" text-center text-[#2A2A2A] font-normal text-xs">
-          {" "}
+           
           <DonutHalf />
           <p>دما</p>
         </div>
         <div className=" text-center text-[#2A2A2A] font-normal text-xs">
-          {" "}
+           
           <DonutHalf />
           <p>فضا</p>
         </div>
