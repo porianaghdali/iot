@@ -1,14 +1,14 @@
-import UsersHeader from "./components/usersHeader";
+import SystemsHeader from "./components/systemsHeader";
 import { Edit, ListFilter } from "lucide-react";
-export default function Users() {
+export default function Systems() {
   const list = [
     { id: 1, title: "ردیف" },
     { id: 2, title: "نام" },
-    { id: 3, title: "نام کاربری" },
-    { id: 4, title: "نقش" },
-    { id: 5, title: "همراه" },
-    { id: 6, title: "ایمیل" },
-    { id: 7, title: "آخرین ورود" },
+    { id: 3, title: "ناحیه " },
+    { id: 4, title: "IP" },
+    { id: 5, title: "نوع" },
+    { id: 6, title: "Community" },
+    { id: 7, title: " آخرین اتصال" },
     { id: 8, title: "وضعیت" },
   ];
   const data = [
@@ -20,7 +20,7 @@ export default function Users() {
       role: "مدیر",
       phone: "09123456789",
       email: "mohammad@",
-      lastLogin: "2023-01-01", 
+      lastLogin: "2023-01-01",
       status: "فعال",
     },
     {
@@ -37,17 +37,29 @@ export default function Users() {
   ];
   return (
     <div className="w-full bg-[#F5F5F7] h-[calc(100vh-64px)] overflow-auto ">
-      <UsersHeader />
-      <button className="border-b border-[#00000033] p-3 w-full bg-white   text-xs font-normal flex items-center gap-2">
-        <ListFilter size={18} />
-        <p className="text-[#0000004D]">فیلتر</p>          
-      </button>
+      <SystemsHeader />
+      <div className="flex items-center justify-between bg-white border-b border-[#00000033] p-3 w-full">
+        <div className="flex items-center  gap-2.5 ">
+          <select
+            name="1"
+            id=""
+            className="border border-[#C1C1C1] rounded-sm w-[114px] text-[#606060] text-xs font-normal"
+          ><option value="ناحیه">ناحیه</option></select>
+          <button className="   text-xs font-normal flex items-center gap-2">
+            <ListFilter size={18} />
+            <p className="text-[#0000004D]">فیلتر</p>
+          </button>
+        </div>
+        <button className="text-[#0D0D0D] font-normal text-xs border border-[#C1C1C1] px-3 py-1.5 rounded-sm ">
+          تنظیم میانگین
+        </button>
+      </div>
       <div>
         <table className="min-w-full border border-gray-300 bg-white">
           <thead className="">
             <tr>
               <th className="border-b border-[#00000033] px-4 py-3 text-center text-[#0D0D0D] text-xs font-normal">
-               <div className="w-4 h-4 rounded-xs border mx-auto border-[#9E9E9E]"></div>
+                <div className="w-4 h-4 rounded-xs border mx-auto border-[#9E9E9E]"></div>
               </th>
               {list.map((item) => (
                 <th
@@ -94,12 +106,10 @@ export default function Users() {
                   {item.status}
                 </td>
                 <td className="border-b border-[#00000033] px-4 py-3 text-center text-[#606060] text-xs  font-normal">
-                  <Edit  size={14} className="mx-auto"/>
+                  <Edit size={14} className="mx-auto" />
                 </td>
               </tr>
             ))}
-           
-            
           </tbody>
         </table>
       </div>
