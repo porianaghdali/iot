@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useState } from "react";
 import Manager from "./manager";
 import Password from "./password";
+import LoginHistory from "./loginHistory";
 export default function Profile({ openProfile, setOpenProfile }) {
   const [selectedItem, setSelectedItem] = useState(null);
 
@@ -14,12 +15,11 @@ export default function Profile({ openProfile, setOpenProfile }) {
     { id: 5, title: "راهنما", icon: <User /> },
     { id: 6, title: "خروج", icon: <User /> },
   ];
-  console.log(selectedItem);
   function renderModalContent(item) {
     switch (item) {
       //login history
       case 1:
-        return <p>نمایش سوابق ورود...</p>;
+        return <LoginHistory setSelectedItem={setSelectedItem}/>;
       //edit profile
       case 2:
         return (
@@ -67,7 +67,7 @@ export default function Profile({ openProfile, setOpenProfile }) {
           className="fixed inset-0 bg-black/40 z-10"
         />
       )}
-
+ 
       {/* باکس پروفایل */}
       {openProfile && (
         <div className="absolute top-14 left-0 w-60 bg-white shadow-lg rounded-sm flex flex-col z-20">

@@ -40,7 +40,7 @@ export default function Card({status}) {
               {status ? "فعال" : "غیر فعال"}
           </p>
         </div>
-        <EllipsisVertical />
+       <button><EllipsisVertical /></button> 
       </div>
 
       <div className="flex gap-5 items-center">
