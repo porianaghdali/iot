@@ -2,9 +2,11 @@
 import { useState } from "react";
 import { Bell, CircleQuestionMark, Menu, User } from "lucide-react";
 import Image from "next/image";
-import Profile from "./profile";
+import Profile from "../app/(main)/profile/profile";
+import Notifications from "../app/(main)/notifications/notifications";
 export default function Header({ toggleSidebar }) {
   const [openProfile, setOpenProfile] = useState(false);
+  const [openNotifications, setOpenNotifications] = useState(false);
 
   return (
     <div className="relative shadow-[0px_2px_4px_1px_#0000001F] h-16 bg-white p-4 flex justify-between z-20">
@@ -24,7 +26,7 @@ export default function Header({ toggleSidebar }) {
           <CircleQuestionMark strokeWidth={1.25} />
         </button>
 
-        <button>
+        <button onClick={() => setOpenNotifications(!openNotifications)}> 
           <Bell strokeWidth={1.25} />
         </button>
 
@@ -35,7 +37,7 @@ export default function Header({ toggleSidebar }) {
         >
           <User strokeWidth={1.25} />
         </button>
-
+<Notifications openNotifications={openNotifications} setOpenNotifications={setOpenNotifications} />
         <Profile setOpenProfile={setOpenProfile} openProfile={openProfile} />
       </div>
     </div>

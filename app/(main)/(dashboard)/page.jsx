@@ -22,9 +22,10 @@ export default function Home() {
           <Card />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Store /> <Card />
+          <Store />
+           <Card />
           <Card />
-          <Create/>
+          <Create />
         </div>
       </div>
     </div>
