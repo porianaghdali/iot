@@ -1,0 +1,70 @@
+@import "tailwindcss";
+@font-face {
+  font-family: "IRANSans";
+  src: url("../public/font/IRANSansWeb(FaNum).woff2") format("woff2"),
+       url("../public/font/IRANSansWeb(FaNum).woff") format("woff"),
+       url("../public/font/IRANSansWeb(FaNum).ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  font-family: "IRANSans", sans-serif;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+@import "tailwindcss";
+
+@theme {
+  /* Backgrounds */
+  --color-background-main: #F5F5F7;
+  --color-background-box: #FFFFFF;
+  --color-background-table-header: #F4F4F4;
+  --color-background-modal-header: #F6F8FA;
+  --color-background-button: #0202020D;
+
+  /* Text */
+  --color-text-title: #0D0D0D;
+  --color-text-secondary: #2A2A2A;
+  --color-text-tertiary: #606060;
+
+  /* UI */
+  --color-border-muted: #C1C1C1;
+  --color-border-main:#00000033;
+  --color-menu-item-hover: #00000008;
+  /* COLORS */
+  --color-green: #20E080;
+  --color-red: #FF4646;
+  --color-blue: #599DE8;
+  --color-orange: #FFA500;
+}
+
+/* Dark */
+.dark {
+  --color-background-main: #161618;
+  --color-background-box: #222124;
+
+  --color-text-title: #FFFFFF;
+  --color-text-secondary: #CBD5E1;
+  --color-text-tertiary: #94A3B8;
+
+  --color-border-muted: #334155;
+    --color-border-main:#525569;
+      --color-menu-item-hover: #282A38;
+
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+button {
+  cursor: pointer;
+}
