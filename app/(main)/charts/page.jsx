@@ -3,7 +3,7 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 import ChartsHeader from "./chartsHeader";
 import Image from "next/image";
 import Filter from "./components/filter";
-import LineChart from "../../../components/utils/charts/line";
+import LineChart from "@/components/charts/line";
 export default function Charts() {
   return (
     <div className="w-full bg-background-main h-[calc(100vh-64px)] overflow-auto ">

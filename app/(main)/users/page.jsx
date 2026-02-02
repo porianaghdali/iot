@@ -1,6 +1,13 @@
+"use client";
+import { useState } from "react";
+import AddUserModal from "./addNode/modal";
 import UsersHeader from "./usersHeader";
 import { Edit, ListFilter } from "lucide-react";
+
 export default function Users() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [step, setStep] = useState(1);
+
   const list = [
     { id: 1, title: "ردیف" },
     { id: 2, title: "نام" },
@@ -26,7 +33,7 @@ export default function Users() {
     {
       id: 2,
       row: 2,
-      name: "محمد",
+      name: "ali",
       username: "mohammad",
       role: "مدیر",
       phone: "09123456789",
@@ -45,11 +52,13 @@ export default function Users() {
     { key: "lastLogin" },
     { key: "status" },
   ];
-
+  const handleClose = () => {
+    setIsOpen(false);
+  };
   return (
     <div className="w-full bg-background-main h-[calc(100vh-64px)] overflow-auto ">
-      <UsersHeader />
-      
+      <UsersHeader setIsOpen={setIsOpen} />
+
       <button className="border-b border-border-main p-3 w-full bg-background-box text-xs font-normal flex items-center gap-2">
         <ListFilter size={18} />
         <p className="text-[#0000004D]">فیلتر</p>
@@ -98,6 +107,12 @@ export default function Users() {
           </tbody>
         </table>
       </div>
+      <AddUserModal
+        handleClose={handleClose}
+        open={isOpen}
+        step={step}
+        setStep={setStep}
+      />
     </div>
   );
 }

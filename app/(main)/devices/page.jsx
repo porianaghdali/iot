@@ -196,7 +196,6 @@ export default function Systems() {
       }
     } catch (error) {}
   };
-console.log(sensorData,"sensorData")
   useEffect(() => {
     handleGetSensorType();
     handleGetZone();
