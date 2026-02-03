@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Token from "./token";
+import Token from "./components/token";
 
 export default function BotHeader() {
  const [isOpen, setIsOpen] = useState(false);

@@ -1,4 +1,4 @@
-import SystemsHeader from "./components/botHeader";
+import BotHeader from "./botHeader";
 import { Trash2, ListFilter } from "lucide-react";
 export default function Bot() {
   const list = [
@@ -34,7 +34,7 @@ export default function Bot() {
   ];
   return (
     <div className="w-full bg-background-main h-[calc(100vh-64px)] overflow-auto ">
-      <SystemsHeader />
+      <BotHeader />
       <div className="flex items-center justify-between bg-background-box border-b border-border-main p-3 w-full">
         <button className="   text-xs font-normal flex items-center gap-2">
           <ListFilter size={18} />

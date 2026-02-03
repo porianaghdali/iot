@@ -28,7 +28,6 @@ export default function AddUserModal({ open, handleClose, step, setStep }) {
     3: <StepThree handleChange={handleChange} formData={formData} />,
     4: <StepFour handleChange={handleChange} formData={formData} />,
   };
-  console.log(formData, "testtt");
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center  ">
       <div
@@ -38,7 +37,7 @@ export default function AddUserModal({ open, handleClose, step, setStep }) {
       <div className="bg-white shadow-[0px_0px_12px_2px_#00000014] relative z-10 rounded-md w-[90%] h-[90%] overflow-hidden flex max-w-xl p-1.5 ">
         <div className="w-full  h-full  overflow-auto relative ">
           {/* Header */}
-          <Header step={step} />
+          <Header step={step}setStep={setStep} />
           {/* Body */}
           <div className="space-y-2 text-xs  h-[78%] ">{steps[step]}</div>
 

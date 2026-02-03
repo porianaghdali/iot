@@ -1,8 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddUserModal from "./addNode/modal";
 import UsersHeader from "./usersHeader";
 import { Edit, ListFilter } from "lucide-react";
+import { getTokenFromCookie } from "@/utils/functions/auth.js";
+import { getUser } from "../../api/fetchUsers";
 
 export default function Users() {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,30 +20,7 @@ export default function Users() {
     { id: 7, title: "آخرین ورود" },
     { id: 8, title: "وضعیت" },
   ];
-  const data = [
-    {
-      id: 1,
-      row: 1,
-      name: "محمد",
-      username: "mohammad",
-      role: "مدیر",
-      phone: "09123456789",
-      email: "mohammad@",
-      lastLogin: "2023-01-01",
-      status: "فعال",
-    },
-    {
-      id: 2,
-      row: 2,
-      name: "ali",
-      username: "mohammad",
-      role: "مدیر",
-      phone: "09123456789",
-      email: "mohammad@",
-      lastLogin: "2023-01-01",
-      status: "فعال",
-    },
-  ];
+  const [userList, setUserList] = useState([]);
   const columns = [
     { key: "row" },
     { key: "name" },
@@ -55,6 +34,24 @@ export default function Users() {
   const handleClose = () => {
     setIsOpen(false);
   };
+  const handleGetUserList = async () => {
+    const token = getTokenFromCookie("token");
+
+    try {
+      const response = await getUser({ token });
+
+      if (response?.errorCode === 0) {
+        setUserList(response.data);
+      }
+    } catch (error) {
+      console.error("Get users list failed:", error);
+    } finally {
+    }
+  };
+  console.log(userList, "userList");
+  useEffect(() => {
+    handleGetUserList();
+  }, []);
   return (
     <div className="w-full bg-background-main h-[calc(100vh-64px)] overflow-auto ">
       <UsersHeader setIsOpen={setIsOpen} />
@@ -82,8 +79,8 @@ export default function Users() {
             </tr>
           </thead>
           <tbody>
-            {data.map((item) => (
-              <tr key={item.id}>
+            {userList.map((item) => (
+              <tr key={item.ID}>
                 <td className="border-b border-border-main px-4 py-3 text-center">
                   <div className="w-4 h-4 rounded-xs border border-[#9E9E9E] mx-auto" />
                 </td>
