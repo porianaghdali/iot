@@ -6,6 +6,7 @@ import { DeleteNodes, getNodes, setNodes } from "../../api/fetchNode";
 import { getTokenFromCookie } from "@/utils/functions/auth.js";
 import AddDeviceModal from "./addNode/modal";
 import { getZone } from "../../api/fetchZone";
+import { getSensorList, getSensorType, setSensor } from "../../api/fetchSensor";
 const initialFormData = {
   deviceName: "",
   active: "",
@@ -65,7 +66,6 @@ export default function Systems() {
   const [sensorList, setSensorList] = useState([]);
   const [sensorTypeList, setSensorTypeList] = useState([]);
   const [zoneList, setZoneList] = useState([]);
-
   const [sensorData, setSensorData] = useState({
     ID: "",
     type: "",
@@ -163,7 +163,6 @@ export default function Systems() {
     } catch (error) {}
   };
   const handleGetSensorList = async () => {
-    console.log("test sens");
     try {
       const response = await getSensorList({ token });
 
@@ -173,7 +172,10 @@ export default function Systems() {
       }
     } catch (error) {}
   };
+
   const handleSetSensor = async () => {
+    console.log(sensorData,"test sensorwww")
+    console.log(formData,"test sensor")
     try {
       const token = getTokenFromCookie("token"); // اسم کوکی توکنت
 
@@ -187,6 +189,8 @@ export default function Systems() {
   };
   //handle zone actions
   const handleGetZone = async () => {
+          const token = getTokenFromCookie("token"); // اسم کوکی توکنت
+
     try {
       const response = await getZone({ token });
 
@@ -312,6 +316,7 @@ export default function Systems() {
         setZoneList={setZoneList}
         sensorData={sensorData}
         setSensorData={setSensorData}
+        handleGetSensorList={handleGetSensorList}
       />
     </div>
   );

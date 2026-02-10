@@ -1,31 +1,27 @@
 import { EllipsisVertical } from "lucide-react";
 import Image from "next/image";
 
-export default function Card({status}) {
+export default function Card({ zone }) {
   const list = [
     {
       id: 1,
       icon: "/images/icons/areas/circle_nodes.svg",
       value: 1,
-      
     },
     {
       id: 4,
       icon: "/images/icons/areas/devices.svg",
       value: 12,
-    
     },
     {
       id: 3,
       icon: "/images/icons/areas/map.svg",
       value: 2,
-      
     },
     {
       id: 2,
       icon: "/images/icons/areas/code_branch.svg",
       value: 32,
-   
     },
   ];
   return (
@@ -35,12 +31,14 @@ export default function Card({status}) {
           <p className="text-text-title text-sx font-normal">اتاق نرم افزار</p>
           <p
             className={`text-text-title text-[10px] font-normal rounded-[50px] w-fit
-           px-[11px] py-0.5 border ${status ? "border-green bg-[#20E0801A]" : "border-red bg-[#FF46461A]"}  `}
+           px-[11px] py-0.5 border ${zone.active ? "border-green bg-[#20E0801A]" : "border-red bg-[#FF46461A]"}  `}
           >
-              {status ? "فعال" : "غیر فعال"}
+            {zone.active ? "فعال" : "غیر فعال"}
           </p>
         </div>
-       <button  className="text-text-title"><EllipsisVertical /></button> 
+        <button className="text-text-title">
+          <EllipsisVertical />
+        </button>
       </div>
 
       <div className="flex gap-5 items-center">
@@ -48,7 +46,9 @@ export default function Card({status}) {
           return (
             <div key={item.id} className="flex items-center gap-1">
               <Image src={item.icon} alt="" width={14} height={14} />
-              <p className="text-text-tertiary text-xs font-normal">{item.value}</p>
+              <p className="text-text-tertiary text-xs font-normal">
+                {item.value}
+              </p>
             </div>
           );
         })}

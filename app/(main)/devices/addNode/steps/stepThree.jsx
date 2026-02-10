@@ -1,11 +1,66 @@
 "use client";
 import CustomInput from "@/components/ui/customInput";
 import CustomSelect from "@/components/ui/customSelect";
-import { setSensor } from "../../../../api/fetchSensor";
-import { getTokenFromCookie } from "@/utils/functions/auth.js";
+import useMqtt from "@/hooks/useMqtt";
+import { useRef, useState } from "react";
 
 export default function StepThree({ formData, sensorTypeList,handleChange,sensorData,setSensorData,handleSetSensor }) {
+const [snmpResult, setSnmpResult] = useState(null);
+  const [snmpStatus, setSnmpStatus] = useState("idle");
+  const snmpStatusRef = useRef("idle");
+  const setSnmpStatusSafe = (status) => {
+    snmpStatusRef.current = status;
+    setSnmpStatus(status);
+  };
+  const { publish, subscribe, onMessage, offMessage, connected } = useMqtt();
 
+  const handleSnmpPull = () => {
+    if (!formData.ip) return;
+
+    setSnmpStatusSafe("loading");
+
+    const snmpPullTopic = `data/${formData.department || "default"}/${formData.zone || "default"}/node/${formData.sensor || "default"}/SNMP/pull`;
+
+    const payload = {
+      ip: formData.ip,
+      oid: sensorData.oid || ".1.3.6.1.2.1.1.3.0",
+      version: formData.config.version || null,
+      authProtocol: formData.config.authProtocol || null,
+      authUser: formData.config.authUser || null,
+      authPass: formData.config.authPass || null,
+      privProtocol: formData.config.privProtocol || "DES",  
+      privPass: formData.config.privPass || null,
+      community: formData.config.community || null,
+    };
+   
+    // subscribe به topic جواب SNMP
+    const snmpTopic = `data/${formData.department || "+"}/${formData.zone || "+"}/node/${formData.sensor || "+"}/SNMP/+`;
+    subscribe(snmpTopic);
+
+    const handleMessage = (msg) => {
+      if (msg.destinationName.includes("/SNMP")) {
+        const result = msg.payloadString;
+        if (result) {
+          setSnmpStatusSafe("success");
+          setSnmpResult(result);
+        } else {
+          setSnmpStatusSafe("fail");
+          setSnmpResult(null);
+        }
+      }
+    };
+
+    onMessage(handleMessage);
+
+    // publish
+    publish(snmpPullTopic, JSON.stringify(payload));
+
+    // timeout برای جلوگیری از stuck شدن
+    setTimeout(() => {
+      if (snmpStatusRef.current === "loading") setSnmpStatusSafe("fail");
+      offMessage(handleMessage); // cleanup بعد از timeout
+    }, 5000);
+  };
   const handleSensorTypeChange = (e) => {
     const value = e.target.value;
 
@@ -23,7 +78,7 @@ export default function StepThree({ formData, sensorTypeList,handleChange,sensor
     value: item.type,
   }));
 
-
+console.log(sensorTypeList,"sensorOptions")
   
   return (
     <div>
@@ -171,7 +226,7 @@ export default function StepThree({ formData, sensorTypeList,handleChange,sensor
           دریافت اطلاعات{" "}
         </label>
         <div className="flex gap-1 w-full max-w-[372px] items-center justify-end">
-          <button className="border border-border-muted w-2/3 p-2.5 rounded bg-[#C1C1C133]">
+          <button  onClick={handleSnmpPull} className="border border-border-muted w-2/3 p-2.5 rounded bg-[#C1C1C133]">
             تست اتصال
           </button>
         </div>
@@ -183,6 +238,13 @@ export default function StepThree({ formData, sensorTypeList,handleChange,sensor
           ثبت سنسور{" "}
         </button>
       </div>
+        {snmpStatus !== "idle" && (
+        <div className="text-sm mt-1">
+          {snmpStatus === "loading" && "⏳ در حال دریافت داده SNMP..."}
+          {snmpStatus === "success" && `✅ نتیجه: ${snmpResult}`}
+          {snmpStatus === "fail" && "❌ دریافت داده SNMP ناموفق بود"}
+        </div>
+      )}
     </div>
   );
 }

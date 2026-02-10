@@ -8,7 +8,7 @@ export default function Setting() {
    { title:" زمان سرور",id:4,img:"/images/icons/settings/server.png",path:"/settings/server"},
    { title:" به‌روز رسانی",id:5,img:"/images/icons/settings/update.png",path:"/settings/update"},
    { title:" پایگاه داده",id:6,img:"/images/icons/settings/data.png",path:"/settings/data"},
-   { title:" مدیریت شبکه",id:7,img:"/images/icons/settings/network.png",path:"/settings/network"},
+   { title:" مدیریت شبکه",id:7,img:"/images/icons/settings/network.png",path:"/settings/networkManagement"},
    { title:" ورود دو عاملی",id:8,img:"/images/icons/settings/protect.png",path:"/settings/protect"},
    { title:" امنیت برنامه",id:9,img:"/images/icons/settings/security.png",path:"/settings/security"},
 

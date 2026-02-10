@@ -1,9 +1,12 @@
+"use client";
 import { User } from "lucide-react";
 import { useState } from "react";
 import Manager from "./manager";
 import Password from "./password";
+import { useRouter } from "next/navigation";
 import LoginHistory from "./loginHistory";
 export default function Profile({ openProfile, setOpenProfile }) {
+    const router = useRouter();
   const [selectedItem, setSelectedItem] = useState(null);
 
   const list = [
@@ -14,6 +17,18 @@ export default function Profile({ openProfile, setOpenProfile }) {
     { id: 5, title: "راهنما", icon: <User /> },
     { id: 6, title: "خروج", icon: <User /> },
   ];
+  const handleLogout = () => {
+    // پاک کردن توکن‌ها از کوکی
+    document.cookie = "token=; path=/; max-age=0";
+    document.cookie = "auth=; path=/; max-age=0";
+
+    // پاک کردن پروفایل کاربر از localStorage
+    localStorage.removeItem("userProfile");
+
+    // ریدایرکت به صفحه ورود
+    router.push("/login");
+  };
+
   function renderModalContent(item) {
     switch (item) {
       //login history
@@ -42,9 +57,9 @@ export default function Profile({ openProfile, setOpenProfile }) {
       // logout
       case 6:
         return (
-          <div>
+          <div className=" relative z-40">
             <p>آیا از حساب کاربری خارج می‌شوید؟</p>
-            <button className="bg-red-600 text-white mt-4 py-2 rounded">
+            <button onClick={handleLogout} className="bg-red-600 text-white mt-4 py-2 rounded">
               خروج
             </button>
           </div>

@@ -75,7 +75,7 @@ const mainMenu = [
     img: "/images/icons/system.svg",
     path: "/systems",
   },
-  { id: 6, title: "نقشه ها", img: "/images/icons/map.svg", path: "/maps" },
+  // { id: 6, title: "نقشه ها", img: "/images/icons/map.svg", path: "/maps" },
   {
     id: 7,
     title: "نمودار ها",
@@ -129,7 +129,7 @@ const settingsMenu = [
     id: 7,
     title: "مدیریت شبکه",
     img: "/images/icons/settings/sideBar/network.svg",
-    path: "/settings/network",
+    path: "/settings/networkManagement",
   },
 ];
 

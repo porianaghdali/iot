@@ -25,7 +25,7 @@ export default function AddDeviceModal({
   zoneList,
   setZoneList,
   sensorData,
-  setSensorData,
+  setSensorData,handleGetSensorList
 }) {
   if (!open) return null;
 
@@ -49,7 +49,6 @@ export default function AddDeviceModal({
       />
     ),
   };
-  console.log(formData,"test form")
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center  ">
       <div
