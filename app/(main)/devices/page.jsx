@@ -40,14 +40,7 @@ const initialSensorData = {
     historySave: false,
     active: false,
   };
-export default function Systems() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isOpenEdit, setIsOpenEdit] = useState(false);
-  const token = getTokenFromCookie("token");
-  const [step, setStep] = useState(1);
-  const [editStep, setEditStep] = useState(1);
-
-  const list = [
+   const list = [
     { id: 1, title: "ردیف" },
     { id: 2, title: "نام" },
     { id: 3, title: "ناحیه " },
@@ -57,6 +50,17 @@ export default function Systems() {
     { id: 7, title: " آخرین اتصال" },
     { id: 8, title: "وضعیت" },
   ];
+export default function Systems() {
+  // modal handler
+  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenEdit, setIsOpenEdit] = useState(false);
+  // token
+  const token = getTokenFromCookie("token");
+  // step handler
+  const [step, setStep] = useState(1);
+  const [editStep, setEditStep] = useState(1);
+  const [sensorsState, setSensorsState] = useState([]);
+ 
   const [formData, setFormData] = useState({
     ID: "",
     deviceName: "",
@@ -114,11 +118,11 @@ export default function Systems() {
       const response = await setNodes({ formData, token });
 
       if (response?.errorCode === 0) {
-        setSensorData((prev) => ({
-          ...prev,
-          node: response.ID,
-        }));
-        handleGetNodes();
+         setFormData((prev) => ({
+        ...prev,
+        ID: response.ID,
+      }));
+        handleGetNodes(); 
       } else {
       }
     } catch (error) {}
@@ -184,19 +188,41 @@ export default function Systems() {
   };
 
   const handleSetSensor = async () => {
+  try {
+    const token = getTokenFromCookie("token");
 
-    try {
-      const token = getTokenFromCookie("token"); // اسم کوکی توکنت
+    const nodeId = formData.ID;
 
-      const response = await setSensor({ formData: sensorData, token });
+    if (!nodeId) {
+      console.error("Node ID not found");
+      return;
+    }
 
-      if (response?.errorCode === 0) {
-        handleGetSensorList();
-        setSensorData(initialSensorData)
-      } else {
+    for (const sensor of sensorsState) {
+      const payload = {
+        ...sensor,
+        node: nodeId,
+      };
+
+      const response = await setSensor({
+        formData: payload,
+        token,
+      });
+
+      if (response?.errorCode !== 0) {
+        console.error("Sensor failed:", payload);
       }
-    } catch (error) {}
-  };
+    }
+
+    // بعد از ثبت همه سنسورها
+    setSensorsState([]);
+    handleGetSensorList();
+
+  } catch (error) {
+    console.error(error);
+  }
+};
+
   //handle zone actions
   const handleGetZone = async () => {
     const token = getTokenFromCookie("token"); // اسم کوکی توکنت
@@ -231,7 +257,14 @@ export default function Systems() {
     setFormData(item);
     setIsOpenEdit(true);
   };
+ const handleAddSensors = () => {
 
+    // اضافه کردن به آرایه
+    setSensorsState((prev) => [...prev, sensorData]);
+
+    // ریست فرم
+    setSensorData(initialSensorData);
+  };
   return (
     <div className="w-full bg-background-main h-[calc(100vh-64px)] overflow-auto ">
       {/* //header */}
@@ -341,6 +374,9 @@ export default function Systems() {
         sensorData={sensorData}
         setSensorData={setSensorData}
         handleGetSensorList={handleGetSensorList}
+        handleAddSensors={handleAddSensors}
+        sensorsState={sensorsState}setSensorsState={setSensorsState}
+        
       />
       <EditNodeModal
         formData={formData}

@@ -3,13 +3,15 @@ import { DeleteSensor } from "../../../api/fetchSensor";
 import { getTokenFromCookie } from "@/utils/functions/auth.js";
 import Image from "next/image";
 
-export default function SensorList({ sensorList, handleGetSensorList }) {
-  
+export default function SensorList({
+  sensorList,
+  handleGetSensorList,
+  sensorsState,setSensorsState
+}) {
   const handleDeleteSensor = async (e) => {
     const token = getTokenFromCookie("token");
 
     const ID = e.currentTarget.id;
-
 
     try {
       const response = await DeleteSensor({ token, ID });
@@ -23,6 +25,9 @@ export default function SensorList({ sensorList, handleGetSensorList }) {
       console.error("API call failed:", error);
     }
   };
+  const handleDelete = (indexToDelete) => {
+    setSensorsState((prev) => prev.filter((_, index) => index !== indexToDelete));
+  };
   return (
     <div className="w-2/5 p-1 flex flex-col gap-2 border-r border-[#E0E0E2]">
       <div className="bg-background-modal-header flex items-center gap-2 px-3 py-6 rounded">
@@ -34,10 +39,10 @@ export default function SensorList({ sensorList, handleGetSensorList }) {
         />
         <p className="text-text-title text-lg font-normal">سنسورهای ثبت شده</p>
       </div>
-      {sensorList.map((item) => {
+      {sensorsState.map((item, index) => {
         return (
           <div
-            key={item.ID}
+            key={index}
             className="flex justify-between items-center p-2 rounded shadow-[0px_0px_4px_0px_#0000001A]"
           >
             <div className="col-span-3 text-xs text-text-title flex items-center gap-2">
@@ -57,25 +62,26 @@ export default function SensorList({ sensorList, handleGetSensorList }) {
                 مقدار
               </p>
               <div className="flex items-center gap-3">
-              <p className="text-text-title text-xs font-normal py-1 px-2 rounded bg-[#599DE81A] w-fit">
-                123022{" "}
-              </p>
-              <div className=" text-center">
-                {item.active ? (
-                  <p className="text-text-title text-xs font-normal py-1 px-2 rounded bg-[#20E0801A] w-fit">
-                    ثبت شد
-                  </p>
-                ) : (
-                  ""
-                )}
+                <p className="text-text-title text-xs font-normal py-1 px-2 rounded bg-[#599DE81A] w-fit">
+                  123022{" "}
+                </p>
+                <div className=" text-center">
+                  {item.active ? (
+                    <p className="text-text-title text-xs font-normal py-1 px-2 rounded bg-[#20E0801A] w-fit">
+                      ثبت شد
+                    </p>
+                  ) : (
+                    ""
+                  )}
+                </div>
+                <button
+                  id={index}
+                  onClick={() => handleDelete(index)}
+                  className="w-fit"
+                >
+                  <Trash2 size={18} color="#606060" strokeWidth={1.25} />
+                </button>
               </div>
-              <button
-                id={item.ID}
-                onClick={handleDeleteSensor}
-                className="w-fit"
-              >
-                <Trash2 size={18} color="#606060" strokeWidth={1.25} />
-              </button></div>
             </div>
           </div>
         );

@@ -17,15 +17,16 @@ export default function AddDeviceModal({
   step,
   setStep,
   sensorList,
-  setSensorList,
   sensorTypeList,
-  setSensorTypeList,
   handleSetSensor,
   handleSensorChange,
   zoneList,
-  setZoneList,
   sensorData,
-  setSensorData,handleGetSensorList
+  setSensorData,
+  handleGetSensorList,
+  handleAddSensors,
+  sensorsState,
+  setSensorsState,
 }) {
   if (!open) return null;
 
@@ -45,7 +46,8 @@ export default function AddDeviceModal({
         sensorTypeList={sensorTypeList}
         sensorData={sensorData}
         setSensorData={setSensorData}
-        handleSetSensor={handleSetSensor}
+        handleAddSensors={handleAddSensors}
+        sensorsState={sensorsState}
       />
     ),
   };
@@ -74,7 +76,9 @@ export default function AddDeviceModal({
         {step == 3 ? (
           <SensorList
             sensorList={sensorList}
+            sensorsState={sensorsState}
             handleGetSensorList={handleGetSensorList}
+            setSensorsState={setSensorsState}
           />
         ) : (
           <LeftImage />
