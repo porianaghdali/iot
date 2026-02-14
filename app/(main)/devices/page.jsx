@@ -4,10 +4,12 @@ import DevicesHeader from "./devicesHeader";
 import { Delete, Edit, ListFilter } from "lucide-react";
 import { DeleteNodes, getNodes, setNodes } from "../../api/fetchNode";
 import { getTokenFromCookie } from "@/utils/functions/auth.js";
-import AddDeviceModal from "./addNode/modal";
+import AddNodeModal from "./addNode/modal";
 import { getZone } from "../../api/fetchZone";
 import { getSensorList, getSensorType, setSensor } from "../../api/fetchSensor";
+import EditNodeModal from "./editNode/modal";
 const initialFormData = {
+  ID: "",
   deviceName: "",
   active: "",
   ip: "",
@@ -29,8 +31,10 @@ const initialFormData = {
 };
 export default function Systems() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpenEdit, setIsOpenEdit] = useState(false);
   const token = getTokenFromCookie("token");
   const [step, setStep] = useState(1);
+  const [editStep, setEditStep] = useState(1);
 
   const list = [
     { id: 1, title: "ردیف" },
@@ -43,7 +47,7 @@ export default function Systems() {
     { id: 8, title: "وضعیت" },
   ];
   const [formData, setFormData] = useState({
-    // ID: "ID",
+    ID: "",
     deviceName: "",
     active: "",
     ip: "",
@@ -108,12 +112,8 @@ export default function Systems() {
       }
     } catch (error) {}
   };
-  const handleDeleteNodes = async (e) => {
+  const handleDeleteNodes = async (ID) => {
     const token = getTokenFromCookie("token");
-
-    const ID = e.currentTarget.id;
-
-    console.log("Deleting node with ID:", ID);
 
     try {
       const response = await DeleteNodes({ token, ID });
@@ -164,7 +164,7 @@ export default function Systems() {
   };
   const handleGetSensorList = async () => {
     try {
-      const response = await getSensorList({ token });
+      const response = await getSensorList({ token,ID:formData.node });
 
       if (response?.errorCode === 0) {
         setSensorList(response.data);
@@ -174,8 +174,8 @@ export default function Systems() {
   };
 
   const handleSetSensor = async () => {
-    console.log(sensorData,"test sensorwww")
-    console.log(formData,"test sensor")
+    console.log(sensorData, "test sensorwww");
+    console.log(formData, "test sensor");
     try {
       const token = getTokenFromCookie("token"); // اسم کوکی توکنت
 
@@ -189,7 +189,7 @@ export default function Systems() {
   };
   //handle zone actions
   const handleGetZone = async () => {
-          const token = getTokenFromCookie("token"); // اسم کوکی توکنت
+    const token = getTokenFromCookie("token"); // اسم کوکی توکنت
 
     try {
       const response = await getZone({ token });
@@ -204,15 +204,24 @@ export default function Systems() {
     handleGetSensorType();
     handleGetZone();
     handleGetSensorList();
-  }, []);
-  useEffect(() => {
     handleGetNodes();
   }, []);
+
   const handleClose = () => {
     setFormData(initialFormData);
     setStep(1);
     setIsOpen(false);
   };
+  const handleEditClose = () => {
+    setFormData(initialFormData);
+    setEditStep(1);
+    setIsOpenEdit(false);
+  };
+  const handleOpenEdit = (item) => {
+    setFormData(item);
+    setIsOpenEdit(true);
+  };
+
   return (
     <div className="w-full bg-background-main h-[calc(100vh-64px)] overflow-auto ">
       {/* //header */}
@@ -286,10 +295,14 @@ export default function Systems() {
                   {item.active}
                 </td>
                 <td className="border-b border-border-main px-4 flex gap-1 py-3 text-center text-text-tertiary text-xs  font-normal">
-                  <button>
+                  <button onClick={() => handleOpenEdit(item)}>
                     <Edit size={14} className="mx-auto cursor-pointer" />
                   </button>
-                  <button id={item.ID} onClick={handleDeleteNodes}>
+
+                  <button
+                    id={item.ID}
+                    onClick={() => handleDeleteNodes(item.ID)}
+                  >
                     <Delete size={14} className="mx-auto cursor-pointer" />
                   </button>
                 </td>
@@ -298,7 +311,7 @@ export default function Systems() {
           </tbody>
         </table>
       </div>
-      <AddDeviceModal
+      <AddNodeModal
         formData={formData}
         open={isOpen}
         step={step}
@@ -308,6 +321,26 @@ export default function Systems() {
         sensorTypeList={sensorTypeList}
         setSensorTypeList={setSensorTypeList}
         handleClose={handleClose}
+        handleChange={handleChange}
+        handleSetNodes={handleSetNodes}
+        handleSetSensor={handleSetSensor}
+        handleSensorChange={handleSensorChange}
+        zoneList={zoneList}
+        setZoneList={setZoneList}
+        sensorData={sensorData}
+        setSensorData={setSensorData}
+        handleGetSensorList={handleGetSensorList}
+      />
+      <EditNodeModal
+        formData={formData}
+        open={isOpenEdit}
+        step={editStep}
+        sensorList={sensorList}
+        setSensorList={setSensorList}
+        setStep={setEditStep}
+        sensorTypeList={sensorTypeList}
+        setSensorTypeList={setSensorTypeList}
+        handleClose={handleEditClose}
         handleChange={handleChange}
         handleSetNodes={handleSetNodes}
         handleSetSensor={handleSetSensor}

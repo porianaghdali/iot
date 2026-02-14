@@ -14,15 +14,18 @@ export async function getSensorType({  token }) {
     throw error;
   }
 }
-export async function getSensorList({  token }) {
+export async function getSensorList({  token,ID }) {
   const url = "https://192.168.30.20/ems3/web/api/user/sensor/list";
 
   try {
+        const formBody = new URLSearchParams({ ID }).toString();
+
     const response = await fetch(url, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`, // اضافه شد
-      },
+      },      body: formBody,
+
     });
     return await response.json();
   } catch (error) {
