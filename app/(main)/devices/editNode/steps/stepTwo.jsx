@@ -43,7 +43,6 @@ export default function StepTwo({ formData, handleChange }) {
       privPass: "privkey1",
       community: null,
     };
-    console.log(payload, "payload");
     // subscribe به topic جواب SNMP
     const snmpTopic = `data/${formData.department || "+"}/${formData.zone || "+"}/node/${formData.sensor || "+"}/SNMP/+`;
     subscribe(snmpTopic);

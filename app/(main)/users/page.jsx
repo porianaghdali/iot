@@ -48,7 +48,6 @@ export default function Users() {
     } finally {
     }
   };
-  console.log(userList, "userList");
   useEffect(() => {
     handleGetUserList();
   }, []);

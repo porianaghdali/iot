@@ -43,6 +43,10 @@ const [snmpResult, setSnmpResult] = useState(null);
         if (result) {
           setSnmpStatusSafe("success");
           setSnmpResult(result);
+          setSensorData((prev) => ({
+                ...prev,
+                mqttValue: result,
+              }))
         } else {
           setSnmpStatusSafe("fail");
           setSnmpResult(null);
@@ -78,7 +82,6 @@ const [snmpResult, setSnmpResult] = useState(null);
     value: item.type,
   }));
 
-console.log(sensorTypeList,"sensorOptions")
   
   return (
     <div>

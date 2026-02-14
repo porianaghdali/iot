@@ -29,6 +29,17 @@ const initialFormData = {
     community: "",
   },
 };
+const initialSensorData = {
+    ID: "",
+    type: "",
+    node: "",
+    sensorName: "",
+    dataType: "",
+    dataAddress: "",
+    oid: "",
+    historySave: false,
+    active: false,
+  };
 export default function Systems() {
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
@@ -80,6 +91,7 @@ export default function Systems() {
     oid: "",
     historySave: false,
     active: false,
+    mqttValue:null
   });
   const [nodesList, setNodesList] = useState([]);
   // nodes actions
@@ -102,7 +114,6 @@ export default function Systems() {
       const response = await setNodes({ formData, token });
 
       if (response?.errorCode === 0) {
-        console.log(response, "test node");
         setSensorData((prev) => ({
           ...prev,
           node: response.ID,
@@ -119,7 +130,6 @@ export default function Systems() {
       const response = await DeleteNodes({ token, ID });
 
       if (response?.errorCode === 0) {
-        console.log("Deleted successfully:", response.data);
         handleGetNodes();
       } else {
         console.error("Error deleting node:", response);
@@ -174,8 +184,7 @@ export default function Systems() {
   };
 
   const handleSetSensor = async () => {
-    console.log(sensorData, "test sensorwww");
-    console.log(formData, "test sensor");
+
     try {
       const token = getTokenFromCookie("token"); // اسم کوکی توکنت
 
@@ -183,6 +192,7 @@ export default function Systems() {
 
       if (response?.errorCode === 0) {
         handleGetSensorList();
+        setSensorData(initialSensorData)
       } else {
       }
     } catch (error) {}
@@ -294,17 +304,18 @@ export default function Systems() {
                 <td className="border-b border-border-main px-4 py-3 text-center text-text-tertiary text-xs font-normal">
                   {item.active}
                 </td>
-                <td className="border-b border-border-main px-4 flex gap-1 py-3 text-center text-text-tertiary text-xs  font-normal">
+                <td className="border-b border-border-main  text-center text-text-tertiary text-xs font-normal">
+                  <div className=" flex gap-4  px-4 py-3 ">
                   <button onClick={() => handleOpenEdit(item)}>
-                    <Edit size={14} className="mx-auto cursor-pointer" />
+                    <Edit size={16} className="mx-auto cursor-pointer" />
                   </button>
 
                   <button
                     id={item.ID}
                     onClick={() => handleDeleteNodes(item.ID)}
                   >
-                    <Delete size={14} className="mx-auto cursor-pointer" />
-                  </button>
+                    <Delete size={16} className="mx-auto cursor-pointer" />
+                  </button></div>
                 </td>
               </tr>
             ))}

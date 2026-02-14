@@ -110,7 +110,6 @@ const setMacStatusSafe = (status) => {
     offMessage(handleMessage); // cleanup بعد از timeout
   }, 5000);
 };
-console.log(formData,"test")
   return (
     <div className="space-y-4">
       {/* Device Name */}

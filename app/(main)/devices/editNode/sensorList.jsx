@@ -10,19 +10,15 @@ export default function SensorList({ sensorList, handleGetSensorList }) {
 
     const ID = e.currentTarget.id;
 
-    console.log("Deleting node with ID:", ID);
 
     try {
       const response = await DeleteSensor({ token, ID });
 
       if (response?.errorCode === 0) {
-        console.log("Deleted successfully:", response.data);
         handleGetSensorList();
       } else {
-        console.error("Error deleting node:", response);
       }
     } catch (error) {
-      console.error("API call failed:", error);
     }
   };
   return (

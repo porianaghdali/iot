@@ -4,8 +4,15 @@ import CustomSelect from "@/components/ui/customSelect";
 import useMqtt from "@/hooks/useMqtt";
 import { useRef, useState } from "react";
 
-export default function StepThree({ formData, sensorTypeList,handleChange,sensorData,setSensorData,handleSetSensor }) {
-const [snmpResult, setSnmpResult] = useState(null);
+export default function StepThree({
+  formData,
+  sensorTypeList,
+  handleChange,
+  sensorData,
+  setSensorData,
+  handleSetSensor,
+}) {
+  const [snmpResult, setSnmpResult] = useState(null);
   const [snmpStatus, setSnmpStatus] = useState("idle");
   const snmpStatusRef = useRef("idle");
   const setSnmpStatusSafe = (status) => {
@@ -28,11 +35,11 @@ const [snmpResult, setSnmpResult] = useState(null);
       authProtocol: formData.config.authProtocol || null,
       authUser: formData.config.authUser || null,
       authPass: formData.config.authPass || null,
-      privProtocol: formData.config.privProtocol || "DES",  
+      privProtocol: formData.config.privProtocol || "DES",
       privPass: formData.config.privPass || null,
       community: formData.config.community || null,
     };
-   
+
     // subscribe به topic جواب SNMP
     const snmpTopic = `data/${formData.department || "+"}/${formData.zone || "+"}/node/${formData.sensor || "+"}/SNMP/+`;
     subscribe(snmpTopic);
@@ -78,8 +85,7 @@ const [snmpResult, setSnmpResult] = useState(null);
     value: item.type,
   }));
 
-console.log(sensorTypeList,"sensorOptions")
-  
+
   return (
     <div>
       <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2]">
@@ -92,7 +98,7 @@ console.log(sensorTypeList,"sensorOptions")
           id="sensorName"
           name="sensorName"
           placeholder="اسم سنسور را وارد کنید"
-          value={sensorData.sensorName }
+          value={sensorData.sensorName}
           onChange={handleChange}
         />
       </div>
@@ -195,9 +201,7 @@ console.log(sensorTypeList,"sensorOptions")
         <label className="text-text-title text-sm font-normal"> وضعیت </label>
         <div className="flex gap-1 w-full max-w-[372px] items-center justify-end">
           <button
-            onClick={() =>
-              setSensorData((prev) => ({ ...prev, active: true }))
-            }
+            onClick={() => setSensorData((prev) => ({ ...prev, active: true }))}
             className={
               sensorData.active
                 ? "border  w-1/3 p-2.5 rounded border-green bg-[#20E0800D]"
@@ -226,19 +230,23 @@ console.log(sensorTypeList,"sensorOptions")
           دریافت اطلاعات{" "}
         </label>
         <div className="flex gap-1 w-full max-w-[372px] items-center justify-end">
-          <button  onClick={handleSnmpPull} className="border border-border-muted w-2/3 p-2.5 rounded bg-[#C1C1C133]">
+          <button
+            onClick={handleSnmpPull}
+            className="border border-border-muted w-2/3 p-2.5 rounded bg-[#C1C1C133]"
+          >
             تست اتصال
           </button>
         </div>
       </div>
       <div className="flex items-center justify-between px-3 py-3.5 ">
-        <button onClick={handleSetSensor}
+        <button
+          onClick={handleSetSensor}
           className="border border-border-muted w-full p-2.5 rounded bg-[#C1C1C133]"
         >
           ثبت سنسور{" "}
         </button>
       </div>
-        {snmpStatus !== "idle" && (
+      {snmpStatus !== "idle" && (
         <div className="text-sm mt-1">
           {snmpStatus === "loading" && "⏳ در حال دریافت داده SNMP..."}
           {snmpStatus === "success" && `✅ نتیجه: ${snmpResult}`}

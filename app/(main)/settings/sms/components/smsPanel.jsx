@@ -35,7 +35,6 @@ export default function SmsPanel() {
       const response = await setSmsPanel({ formData, token });
 
       if (response?.errorCode === 0) {
-        console.log(response);
       } else {
       }
     } catch (error) {}
