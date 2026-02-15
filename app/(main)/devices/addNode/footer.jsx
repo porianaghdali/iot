@@ -1,8 +1,31 @@
-export default function Footer({ setStep, step, onClose, submit,handleSetSensor }) {
-  const handleSubmit=()=>{
-    submit()
-    setStep(step + 1)
-  }
+"use client";
+import { useNodes } from "@/hooks/useNodes";
+import { getTokenFromCookie } from "@/utils/functions/auth";
+import { useMemo } from "react";
+
+export default function Footer({ setStep, step, formData, setFormData }) {
+  const token = useMemo(() => getTokenFromCookie("token"), []);
+
+  const { createNode } = useNodes(token);
+  const handleSaveNode = async () => {
+    const newId = await createNode(formData);
+    if (newId) {
+      setFormData((p) => ({ ...p, ID: newId }));
+    }
+    return newId; // 🔹 برگردوندن ID
+  };
+
+  const handleSubmit = async () => {
+    const newId = await handleSaveNode();
+    
+    if (newId) {
+      // حالا می‌تونی مستقیماً از newId استفاده کنی
+    }
+    setStep(step + 1); // بعد از اینکه ID مطمئناً آماده شد
+  };
+
+
+  
   return (
     <div className="flex justify-between items-center mt-6 ">
       <button
@@ -14,21 +37,14 @@ export default function Footer({ setStep, step, onClose, submit,handleSetSensor 
       </button>
 
       <div className="flex gap-2">
-        <button
-          onClick={onClose}
-          className="text-sm border rounded disabled:opacity-40 text-text-title border-red w-24 h-9 bg-[#FF46460D]"
-        >
-          انصراف
-        </button>
-
-        {step ==1 ? (
+        {step == 1 ? (
           <button
             onClick={() => setStep(step + 1)}
             className="text-sm border rounded disabled:opacity-40 text-text-title border-[#C1c1c1] w-24 h-9"
           >
             بعدی
           </button>
-        ) :step==2?(
+        ) : step == 2 ? (
           <button
             onClick={handleSubmit}
             className="text-sm border rounded disabled:opacity-40 text-text-title border-[#C1c1c1] w-24 h-9"
@@ -37,7 +53,7 @@ export default function Footer({ setStep, step, onClose, submit,handleSetSensor 
           </button>
         ) : (
           <button
-          onClick={handleSetSensor}
+            // onClick={handleSetSensor}
             className="text-xs px-3 py-1 bg-black text-white rounded"
           >
             ثبت

@@ -1,13 +1,13 @@
 "use client";
-import { useEffect, useState } from "react";
 import DevicesHeader from "./devicesHeader";
 import { Delete, Edit, ListFilter } from "lucide-react";
-import { DeleteNodes, getNodes, setNodes } from "../../api/fetchNode";
-import { getTokenFromCookie } from "@/utils/functions/auth.js";
 import AddNodeModal from "./addNode/modal";
-import { getZone } from "../../api/fetchZone";
-import { getSensorList, getSensorType, setSensor } from "../../api/fetchSensor";
 import EditNodeModal from "./editNode/modal";
+
+import { getTokenFromCookie } from "@/utils/functions/auth";
+import { useNodes } from "@/hooks/useNodes";
+import { useEffect, useMemo, useState } from "react";
+
 const initialFormData = {
   ID: "",
   deviceName: "",
@@ -29,121 +29,46 @@ const initialFormData = {
     community: "",
   },
 };
-const initialSensorData = {
-    ID: "",
-    type: "",
-    node: "",
-    sensorName: "",
-    dataType: "",
-    dataAddress: "",
-    oid: "",
-    historySave: false,
-    active: false,
-  };
-   const list = [
-    { id: 1, title: "ردیف" },
-    { id: 2, title: "نام" },
-    { id: 3, title: "ناحیه " },
-    { id: 4, title: "IP" },
-    { id: 5, title: "نوع" },
-    { id: 6, title: "Community" },
-    { id: 7, title: " آخرین اتصال" },
-    { id: 8, title: "وضعیت" },
-  ];
+
+const list = [
+  { id: 1, title: "ردیف" },
+  { id: 2, title: "نام" },
+  { id: 3, title: "ناحیه " },
+  { id: 4, title: "IP" },
+  { id: 5, title: "نوع" },
+  { id: 6, title: "Community" },
+  { id: 7, title: " آخرین اتصال" },
+  { id: 8, title: "وضعیت" },
+];
 export default function Systems() {
-  // modal handler
+  const token = useMemo(() => getTokenFromCookie("token"), []);
+
+  // modal
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
-  // token
-  const token = getTokenFromCookie("token");
-  // step handler
+
+  // steps
   const [step, setStep] = useState(1);
   const [editStep, setEditStep] = useState(1);
-  const [sensorsState, setSensorsState] = useState([]);
- 
-  const [formData, setFormData] = useState({
-    ID: "",
-    deviceName: "",
-    active: "",
-    ip: "",
-    mac: "",
-    zone: "",
-    protocol: "",
-    interval: "",
-    config: {
-      version: " ",
-      port: "",
-      slaveID: "",
-      authProtocol: "",
-      authUser: "",
-      authPass: "",
-      privProtocol: "",
-      privPass: "",
-      community: "",
-    },
-  });
-  const [sensorList, setSensorList] = useState([]);
-  const [sensorTypeList, setSensorTypeList] = useState([]);
-  const [zoneList, setZoneList] = useState([]);
-  const [sensorData, setSensorData] = useState({
-    ID: "",
-    type: "",
-    node: "",
-    sensorName: "",
-    dataType: "",
-    dataAddress: "",
-    oid: "",
-    historySave: false,
-    active: false,
-    mqttValue:null
-  });
-  const [nodesList, setNodesList] = useState([]);
-  // nodes actions
-  const handleGetNodes = async () => {
-    const token = getTokenFromCookie("token");
 
-    try {
-      const response = await getNodes({ token });
+  // forms
+  const [formData, setFormData] = useState(initialFormData);
 
-      if (response?.errorCode === 0) {
-        setNodesList(response.data);
-      }
-    } catch (error) {
-      console.error("Get nodes failed:", error);
-    } finally {
-    }
-  };
-  const handleSetNodes = async () => {
-    try {
-      const response = await setNodes({ formData, token });
+  const { nodes, getNodesList, deleteNode } = useNodes(token);
 
-      if (response?.errorCode === 0) {
-         setFormData((prev) => ({
-        ...prev,
-        ID: response.ID,
-      }));
-        handleGetNodes(); 
-      } else {
-      }
-    } catch (error) {}
-  };
-  const handleDeleteNodes = async (ID) => {
-    const token = getTokenFromCookie("token");
 
-    try {
-      const response = await DeleteNodes({ token, ID });
 
-      if (response?.errorCode === 0) {
-        handleGetNodes();
-      } else {
-        console.error("Error deleting node:", response);
-      }
-    } catch (error) {
-      console.error("API call failed:", error);
-    }
-  };
-  //handle formData
-  const handleChange = (path, value) => {
+
+
+  useEffect(() => {
+    getNodesList();
+  }, []);
+
+  
+
+
+
+ const handleChange = (path, value) => {
     setFormData((prev) => {
       const updated = { ...prev };
       let current = updated;
@@ -156,115 +81,23 @@ export default function Systems() {
       current[path[path.length - 1]] = value;
       return updated;
     });
+  }; 
+  const handleOpenEdit = (item) => {
+    setFormData(item);
+    setIsOpenEdit(true);
   };
-  //sensors actions
-  const handleSensorChange = (e) => {
-    const { name, value } = e.target;
-
-    setSensorData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-  const handleGetSensorType = async () => {
-    try {
-      const response = await getSensorType({ token });
-
-      if (response?.errorCode === 0) {
-        setSensorTypeList(response.data);
-      } else {
-      }
-    } catch (error) {}
-  };
-  const handleGetSensorList = async () => {
-    try {
-      const response = await getSensorList({ token,ID:formData.node });
-
-      if (response?.errorCode === 0) {
-        setSensorList(response.data);
-      } else {
-      }
-    } catch (error) {}
-  };
-
-  const handleSetSensor = async () => {
-  try {
-    const token = getTokenFromCookie("token");
-
-    const nodeId = formData.ID;
-
-    if (!nodeId) {
-      console.error("Node ID not found");
-      return;
-    }
-
-    for (const sensor of sensorsState) {
-      const payload = {
-        ...sensor,
-        node: nodeId,
-      };
-
-      const response = await setSensor({
-        formData: payload,
-        token,
-      });
-
-      if (response?.errorCode !== 0) {
-        console.error("Sensor failed:", payload);
-      }
-    }
-
-    // بعد از ثبت همه سنسورها
-    setSensorsState([]);
-    handleGetSensorList();
-
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-  //handle zone actions
-  const handleGetZone = async () => {
-    const token = getTokenFromCookie("token"); // اسم کوکی توکنت
-
-    try {
-      const response = await getZone({ token });
-
-      if (response?.errorCode === 0) {
-        setZoneList(response.data);
-      } else {
-      }
-    } catch (error) {}
-  };
-  useEffect(() => {
-    handleGetSensorType();
-    handleGetZone();
-    handleGetSensorList();
-    handleGetNodes();
-  }, []);
-
   const handleClose = () => {
     setFormData(initialFormData);
     setStep(1);
     setIsOpen(false);
   };
+
   const handleEditClose = () => {
     setFormData(initialFormData);
     setEditStep(1);
     setIsOpenEdit(false);
   };
-  const handleOpenEdit = (item) => {
-    setFormData(item);
-    setIsOpenEdit(true);
-  };
- const handleAddSensors = () => {
 
-    // اضافه کردن به آرایه
-    setSensorsState((prev) => [...prev, sensorData]);
-
-    // ریست فرم
-    setSensorData(initialSensorData);
-  };
   return (
     <div className="w-full bg-background-main h-[calc(100vh-64px)] overflow-auto ">
       {/* //header */}
@@ -308,7 +141,7 @@ export default function Systems() {
             </tr>
           </thead>
           <tbody>
-            {nodesList.map((item, key) => (
+            {nodes.map((item, key) => (
               <tr key={item.ID}>
                 <td className="border-b border-border-main px-4 py-3 text-center  text-text-tertiary text-xs font-normal">
                   <div className="w-4 h-4 rounded-xs border border-[#9E9E9E] mx-auto"></div>
@@ -339,16 +172,14 @@ export default function Systems() {
                 </td>
                 <td className="border-b border-border-main  text-center text-text-tertiary text-xs font-normal">
                   <div className=" flex gap-4  px-4 py-3 ">
-                  <button onClick={() => handleOpenEdit(item)}>
-                    <Edit size={16} className="mx-auto cursor-pointer" />
-                  </button>
+                    <button onClick={() => handleOpenEdit(item)}>
+                      <Edit size={16} className="mx-auto cursor-pointer" />
+                    </button>
 
-                  <button
-                    id={item.ID}
-                    onClick={() => handleDeleteNodes(item.ID)}
-                  >
-                    <Delete size={16} className="mx-auto cursor-pointer" />
-                  </button></div>
+                    <button onClick={() => deleteNode(item.ID)}>
+                      <Delete size={16} className="mx-auto cursor-pointer" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -359,44 +190,19 @@ export default function Systems() {
         formData={formData}
         open={isOpen}
         step={step}
-        sensorList={sensorList}
-        setSensorList={setSensorList}
         setStep={setStep}
-        sensorTypeList={sensorTypeList}
-        setSensorTypeList={setSensorTypeList}
         handleClose={handleClose}
         handleChange={handleChange}
-        handleSetNodes={handleSetNodes}
-        handleSetSensor={handleSetSensor}
-        handleSensorChange={handleSensorChange}
-        zoneList={zoneList}
-        setZoneList={setZoneList}
-        sensorData={sensorData}
-        setSensorData={setSensorData}
-        handleGetSensorList={handleGetSensorList}
-        handleAddSensors={handleAddSensors}
-        sensorsState={sensorsState}setSensorsState={setSensorsState}
-        
+        setFormData={setFormData}
       />
+
       <EditNodeModal
         formData={formData}
         open={isOpenEdit}
         step={editStep}
-        sensorList={sensorList}
-        setSensorList={setSensorList}
         setStep={setEditStep}
-        sensorTypeList={sensorTypeList}
-        setSensorTypeList={setSensorTypeList}
         handleClose={handleEditClose}
         handleChange={handleChange}
-        handleSetNodes={handleSetNodes}
-        handleSetSensor={handleSetSensor}
-        handleSensorChange={handleSensorChange}
-        zoneList={zoneList}
-        setZoneList={setZoneList}
-        sensorData={sensorData}
-        setSensorData={setSensorData}
-        handleGetSensorList={handleGetSensorList}
       />
     </div>
   );

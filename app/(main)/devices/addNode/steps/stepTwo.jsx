@@ -32,7 +32,7 @@ export default function StepTwo({ formData, handleChange }) {
       privPass: formData.config.privPass || null,
       community: formData.config.community || null,
     };
-  
+
     // subscribe به topic جواب SNMP
     const snmpTopic = `data/${formData.department || "+"}/${formData.zone || "+"}/node/${formData.sensor || "+"}/SNMP/+`;
     subscribe(snmpTopic);
@@ -108,8 +108,7 @@ export default function StepTwo({ formData, handleChange }) {
           onChange={(e) => handleChange(["config", "version"], e.target.value)}
         />
       </div>
-      {(formData.config.version == 2 ||
-        formData.config.version == 1) && (
+      {(formData.config.version == 2 || formData.config.version == 1) && (
         <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2]">
           <label className="text-text-title text-sm font-normal">
             Community{" "}
@@ -162,11 +161,12 @@ export default function StepTwo({ formData, handleChange }) {
               onClick={(e) =>
                 handleChange(["config", "authProtocol"], e.target.value)
               }
-className={
-              formData.config.authProtocol==="SHAI"
-                ? "border  w-1/5 p-2.5 rounded border-green bg-[#20E0800D]"
-                : "border border-border-muted w-1/5 p-2.5 rounded bg-[#C1C1C133]"
-            }             >
+              className={
+                formData.config.authProtocol === "SHAI"
+                  ? "border  w-1/5 p-2.5 rounded border-green bg-[#20E0800D]"
+                  : "border border-border-muted w-1/5 p-2.5 rounded bg-[#C1C1C133]"
+              }
+            >
               SHAI
             </button>
             <button
@@ -174,11 +174,12 @@ className={
               onClick={(e) =>
                 handleChange(["config", "authProtocol"], e.target.value)
               }
-className={
-              formData.config.authProtocol==="MD5"
-                ? "border  w-1/5 p-2.5 rounded border-green bg-[#20E0800D]"
-                : "border border-border-muted w-1/5 p-2.5 rounded bg-[#C1C1C133]"
-            }            >
+              className={
+                formData.config.authProtocol === "MD5"
+                  ? "border  w-1/5 p-2.5 rounded border-green bg-[#20E0800D]"
+                  : "border border-border-muted w-1/5 p-2.5 rounded bg-[#C1C1C133]"
+              }
+            >
               MD5
             </button>
           </div>
@@ -205,11 +206,12 @@ className={
               onClick={(e) =>
                 handleChange(["config", "privProtocol"], e.target.value)
               }
-  className={
-              formData.config.privProtocol==="AES"
-                ? "border  w-1/5 p-2.5 rounded border-green bg-[#20E0800D]"
-                : "border border-border-muted w-1/5 p-2.5 rounded bg-[#C1C1C133]"
-            }            >
+              className={
+                formData.config.privProtocol === "AES"
+                  ? "border  w-1/5 p-2.5 rounded border-green bg-[#20E0800D]"
+                  : "border border-border-muted w-1/5 p-2.5 rounded bg-[#C1C1C133]"
+              }
+            >
               AES
             </button>
             <button
@@ -218,10 +220,10 @@ className={
                 handleChange(["config", "privProtocol"], e.target.value)
               }
               className={
-              formData.config.privProtocol==="DES"
-                ? "border  w-1/5 p-2.5 rounded border-green bg-[#20E0800D]"
-                : "border border-border-muted w-1/5 p-2.5 rounded bg-[#C1C1C133]"
-            }
+                formData.config.privProtocol === "DES"
+                  ? "border  w-1/5 p-2.5 rounded border-green bg-[#20E0800D]"
+                  : "border border-border-muted w-1/5 p-2.5 rounded bg-[#C1C1C133]"
+              }
             >
               DES
             </button>

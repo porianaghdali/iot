@@ -1,24 +1,32 @@
-
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import CustomInput from "../../../../../components/ui/customInput";
 import CustomSelect from "../../../../../components/ui/customSelect";
 import useMqtt from "@/hooks/useMqtt";
+import { useZones } from "@/hooks/useZones";
+import { getTokenFromCookie } from "@/utils/functions/auth";
 
-export default function StepOne({ formData, handleChange, zoneList }) {
+export default function StepOne({ formData, handleChange }) {
+  const token = useMemo(() => getTokenFromCookie("token"), []);
+
+  const { zones, getZonesList } = useZones(token);
+  useEffect(() => {
+    getZonesList();
+  }, []);
+
   const { publish, subscribe, onMessage, offMessage, connected } = useMqtt();
   const [pingStatus, setPingStatus] = useState("idle");
   const [latency, setLatency] = useState(null);
-const macStatusRef = useRef("idle");
-const setMacStatusSafe = (status) => {
-  macStatusRef.current = status;
-};
+  const macStatusRef = useRef("idle");
+  const setMacStatusSafe = (status) => {
+    macStatusRef.current = status;
+  };
   const pingStatusRef = useRef("idle");
   const setPingStatusSafe = (status) => {
     pingStatusRef.current = status;
     setPingStatus(status);
   };
-  const zoneOptions = zoneList.map((item) => ({
+  const zoneOptions = zones.map((item) => ({
     label: item.zoneName,
     value: item.zoneName,
   }));
@@ -73,48 +81,48 @@ const setMacStatusSafe = (status) => {
     }, 5000);
   };
 
-
-
   const handleMacPull = () => {
-  if (!formData.ip) return;
+    if (!formData.ip) return;
 
-  setMacStatusSafe("loading");
+    setMacStatusSafe("loading");
 
-  const arpPullTopic = `data/${formData.department || "default"}/${formData.zone || "default"}/node/${formData.sensor || "default"}/Network/arp/pull`;
-  const payload = JSON.stringify({ ip: formData.ip });
+    const arpPullTopic = `data/${formData.department || "default"}/${formData.zone || "default"}/node/${formData.sensor || "default"}/Network/arp/pull`;
+    const payload = JSON.stringify({ ip: formData.ip });
 
-  // subscribe به topic جواب arp
-  const arpTopic = `data/${formData.department || "+"}/${formData.zone || "+"}/node/${formData.sensor || "+"}/Network/arp/+`;
-  subscribe(arpTopic);
+    // subscribe به topic جواب arp
+    const arpTopic = `data/${formData.department || "+"}/${formData.zone || "+"}/node/${formData.sensor || "+"}/Network/arp/+`;
+    subscribe(arpTopic);
 
-  const handleMessage = (msg) => {
-    if (msg.destinationName.includes("/arp")) {
-      const result = msg.payloadString;
-      if (result) {
-        setMacStatusSafe("success");
-        handleChange(["mac"], result); // update فرم هم
-      } else {
-        setMacStatusSafe("fail");
+    const handleMessage = (msg) => {
+      if (msg.destinationName.includes("/arp")) {
+        const result = msg.payloadString;
+        if (result) {
+          setMacStatusSafe("success");
+          handleChange(["mac"], result); // update فرم هم
+        } else {
+          setMacStatusSafe("fail");
+        }
       }
-    }
+    };
+
+    onMessage(handleMessage);
+
+    // publish
+    publish(arpPullTopic, payload);
+
+    // timeout برای جلوگیری از stuck شدن
+    setTimeout(() => {
+      if (macStatusRef.current === "loading") setMacStatusSafe("fail");
+      offMessage(handleMessage); // cleanup بعد از timeout
+    }, 5000);
   };
-
-  onMessage(handleMessage);
-
-  // publish
-  publish(arpPullTopic, payload);
-
-  // timeout برای جلوگیری از stuck شدن
-  setTimeout(() => {
-    if (macStatusRef.current === "loading") setMacStatusSafe("fail");
-    offMessage(handleMessage); // cleanup بعد از timeout
-  }, 5000);
-};
   return (
     <div className="space-y-4">
       {/* Device Name */}
       <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2]">
-        <label className="text-text-title text-sm font-normal">نام دستگاه</label>
+        <label className="text-text-title text-sm font-normal">
+          نام دستگاه
+        </label>
         <CustomInput
           placeholder="نام دستگاه را وارد کنید"
           id="deviceName"
@@ -137,28 +145,26 @@ const setMacStatusSafe = (status) => {
           onChange={(e) => handleChange(["ip"], e.target.value)}
         />
       </div>
- <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2] ">
-  <label className="text-text-title text-sm font-normal"> MAC</label>
-  <div className="flex gap-1 w-full max-w-[372px]">
-    <CustomInput
-      id="mac"
-      name="mac"
-      placeholder="آدرس MAC خود را وارد کنید"
-      value={formData.mac}
-      onChange={(e) => {
-        handleChange(["mac"], e.target.value);
-      }}
-    />
-    <button
-      onClick={handleMacPull}
-      className="border border-border-muted p-2.5 rounded bg-[#C1C1C133]"
-    >
-      MAC
-    </button>
-  </div>
-
-
-</div>
+      <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2] ">
+        <label className="text-text-title text-sm font-normal"> MAC</label>
+        <div className="flex gap-1 w-full max-w-[372px]">
+          <CustomInput
+            id="mac"
+            name="mac"
+            placeholder="آدرس MAC خود را وارد کنید"
+            value={formData.mac}
+            onChange={(e) => {
+              handleChange(["mac"], e.target.value);
+            }}
+          />
+          <button
+            onClick={handleMacPull}
+            className="border border-border-muted p-2.5 rounded bg-[#C1C1C133]"
+          >
+            MAC
+          </button>
+        </div>
+      </div>
 
       {/* Zone */}
       <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2]">

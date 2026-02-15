@@ -46,6 +46,7 @@ export default function Login() {
       if (loginResult.errorCode === 0) {
         document.cookie = `token=${loginResult.jwt}; path=/;`;
         document.cookie = `auth=${loginResult.auth}; path=/;`;
+        document.cookie = `username=${loginResult.username}; path=/;`;
 
         const profileResult = await fetchUserProfile({
           token: loginResult.jwt,

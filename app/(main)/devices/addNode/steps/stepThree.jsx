@@ -3,15 +3,23 @@ import CustomInput from "@/components/ui/customInput";
 import CustomSelect from "@/components/ui/customSelect";
 import useMqtt from "@/hooks/useMqtt";
 import { useRef, useState } from "react";
-
+import { useSensors } from "@/hooks/useSensors";
+import { getTokenFromCookie } from "@/utils/functions/auth";
+import { useEffect, useMemo } from "react";
 export default function StepThree({
   formData,
-  sensorTypeList,
   handleChange,
   sensorData,
   setSensorData,
-  handleAddSensors,sensorsState
+  handleAddSensors,
 }) {
+  const token = useMemo(() => getTokenFromCookie("token"), []);
+  const {  getTypes, sensorTypes } =
+    useSensors(token, formData.ID);
+
+  useEffect(() => {
+    getTypes();
+  }, []);
   const [snmpResult, setSnmpResult] = useState(null);
   const [snmpStatus, setSnmpStatus] = useState("idle");
   const snmpStatusRef = useRef("idle");
@@ -75,7 +83,7 @@ export default function StepThree({
   const handleSensorTypeChange = (e) => {
     const value = e.target.value;
 
-    const sensor = sensorTypeList.find((item) => item.type === value);
+    const sensor = sensorTypes.find((item) => item.type === value);
     if (!sensor) return;
 
     setSensorData((prev) => ({
@@ -84,7 +92,7 @@ export default function StepThree({
       oid: sensor.oid,
     }));
   };
-  const sensorOptions = sensorTypeList.map((item) => ({
+  const sensorOptions = sensorTypes.map((item) => ({
     label: item.type,
     value: item.type,
   }));
@@ -115,7 +123,6 @@ export default function StepThree({
             dir="ltr"
             textAlign=""
             value={sensorData.oid}
-            
           />
         </div>
       )}

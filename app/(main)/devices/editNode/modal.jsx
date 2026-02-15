@@ -1,77 +1,52 @@
-"use client";
-import StepOne from "./steps/stepOne";
-import StepTwo from "./steps/stepTwo";
-import StepThree from "./steps/stepThree";
-import LeftImage from "./leftImage";
-import Footer from "./footer";
-import Header from "./header";
-
-import SensorList from "./sensorList";
-
 export default function EditNodeModal({
   open,
-  handleChange,
   formData,
   handleClose,
-  handleSetNodes,
   step,
   setStep,
   sensorList,
-  setSensorList,
+  handleGetSensorList,
   sensorTypeList,
-  setSensorTypeList,
-  handleSetSensor,
-  handleSensorChange,
-  zoneList,
-  setZoneList,
   sensorData,
-  setSensorData,handleGetSensorList
+  setSensorData,
+  onSaveNode,
+  onSaveSensors,
 }) {
   if (!open) return null;
 
   const steps = {
-    1: (
-      <StepOne
-        formData={formData}
-        handleChange={handleChange}
-        zoneList={zoneList}
-      />
-    ),
-    2: <StepTwo formData={formData} handleChange={handleChange} />,
+    1: <StepOne formData={formData} />,
+    2: <StepTwo formData={formData} />,
     3: (
       <StepThree
-        formData={formData}
-        handleChange={handleSensorChange}
         sensorTypeList={sensorTypeList}
         sensorData={sensorData}
         setSensorData={setSensorData}
-        handleSetSensor={handleSetSensor}
+        handleSetSensor={onSaveSensors}
       />
     ),
   };
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center  ">
-      <div
-        className="w-full h-full z-0 absolute bg-[#0D0D0D26]"
-        onClick={handleClose}
-      ></div>
-      <div className="bg-white shadow-[0px_0px_12px_2px_#00000014] relative z-10 rounded-md w-[90%] h-[90%] overflow-hidden flex ">
-        <div className="w-full xl:w-3/5 h-full px-[4%] py-[2%] overflow-auto ">
-          {/* Header */}
-          <Header step={step}  setStep={setStep}/>
-          {/* Body */}
-          <div className="space-y-2 text-xs ">{steps[step]}</div>
 
-          {/* Footer */}
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div
+        className="absolute inset-0 z-0 bg-[#0D0D0D26]"
+        onClick={handleClose}
+      />
+      <div className="relative z-10 flex w-[90%] h-[90%] overflow-hidden rounded-md bg-white shadow-[0px_0px_12px_2px_#00000014]">
+        <div className="w-full xl:w-3/5 h-full px-[4%] py-[2%] overflow-auto">
+          <Header step={step} setStep={setStep} />
+          <div className="space-y-2 text-xs">{steps[step]}</div>
           <Footer
             step={step}
             setStep={setStep}
             onClose={handleClose}
-            submit={handleSetNodes}
-            handleSetSensor={handleSetSensor}
+            onSaveNode={onSaveNode}
+            onSaveSensors={onSaveSensors}
           />
         </div>
-        {step == 3 ? (
+
+        {step === 3 ? (
           <SensorList
             sensorList={sensorList}
             handleGetSensorList={handleGetSensorList}

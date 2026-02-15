@@ -9,8 +9,6 @@ export default function useMqtt() {
   const [connected, setConnected] = useState(false);
 
   // اطلاعات کاربر
-  const userProfile = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("userProfile")) : null;
-  const username = userProfile?.user?.username;
 
   const getCookie = (name) => {
     if (typeof document === "undefined") return null;
@@ -18,6 +16,7 @@ export default function useMqtt() {
     return match ? match[2] : null;
   };
   const authToken = getCookie("auth");
+  const username = getCookie("username");
 
   useEffect(() => {
     if (typeof window === "undefined") return;

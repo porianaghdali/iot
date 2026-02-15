@@ -41,7 +41,7 @@ export async function getNodes({ token }) {
     throw error;
   }
 }
-export async function DeleteNodes({ token, ID }) {
+export async function DeleteNodes({ ID, token }) {
   const url = "https://192.168.30.20/ems3/web/api/user/node/delete";
 
   try {
