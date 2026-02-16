@@ -22,7 +22,7 @@ const initialSensorData = {
   oid: "",
   historySave: 0,
   active: 0,
-  mqttValue:""
+  mqttValue: "",
 };
 export default function AddDeviceModal({
   open,

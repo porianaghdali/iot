@@ -3,15 +3,22 @@ import CustomInput from "@/components/ui/customInput";
 import CustomSelect from "@/components/ui/customSelect";
 import useMqtt from "@/hooks/useMqtt";
 import { useRef, useState } from "react";
-
+import { useSensors } from "@/hooks/useSensors";
+import { getTokenFromCookie } from "@/utils/functions/auth";
+import { useEffect, useMemo } from "react";
 export default function StepThree({
   formData,
-  sensorTypeList,
   handleChange,
   sensorData,
   setSensorData,
-  handleSetSensor,
+  handleAddSensors,
 }) {
+  const token = useMemo(() => getTokenFromCookie("token"), []);
+  const { getTypes, sensorTypes, } = useSensors(token, formData.ID);
+
+  useEffect(() => {
+    getTypes();
+  }, []);
   const [snmpResult, setSnmpResult] = useState(null);
   const [snmpStatus, setSnmpStatus] = useState("idle");
   const snmpStatusRef = useRef("idle");
@@ -50,6 +57,10 @@ export default function StepThree({
         if (result) {
           setSnmpStatusSafe("success");
           setSnmpResult(result);
+          setSensorData((prev) => ({
+            ...prev,
+            mqttValue: result,
+          }));
         } else {
           setSnmpStatusSafe("fail");
           setSnmpResult(null);
@@ -71,20 +82,20 @@ export default function StepThree({
   const handleSensorTypeChange = (e) => {
     const value = e.target.value;
 
-    const sensor = sensorTypeList.find((item) => item.type === value);
+    const sensor = sensorTypes.find((item) => item.type === value);
     if (!sensor) return;
 
     setSensorData((prev) => ({
       ...prev,
+      node: formData.ID,
       type: value,
       oid: sensor.oid,
     }));
   };
-  const sensorOptions = sensorTypeList.map((item) => ({
+  const sensorOptions = sensorTypes.map((item) => ({
     label: item.type,
     value: item.type,
   }));
-
 
   return (
     <div>
@@ -112,7 +123,6 @@ export default function StepThree({
             dir="ltr"
             textAlign=""
             value={sensorData.oid}
-            readOnly
           />
         </div>
       )}
@@ -173,7 +183,7 @@ export default function StepThree({
         <div className="flex gap-1 w-full max-w-[372px] items-center justify-end">
           <button
             onClick={() =>
-              setSensorData((prev) => ({ ...prev, historySave: true }))
+              setSensorData((prev) => ({ ...prev, historySave: 1 }))
             }
             className={
               sensorData.historySave
@@ -185,7 +195,7 @@ export default function StepThree({
           </button>
           <button
             onClick={() =>
-              setSensorData((prev) => ({ ...prev, historySave: false }))
+              setSensorData((prev) => ({ ...prev, historySave: 0 }))
             }
             className={
               sensorData.historySave
@@ -201,7 +211,7 @@ export default function StepThree({
         <label className="text-text-title text-sm font-normal"> وضعیت </label>
         <div className="flex gap-1 w-full max-w-[372px] items-center justify-end">
           <button
-            onClick={() => setSensorData((prev) => ({ ...prev, active: true }))}
+            onClick={() => setSensorData((prev) => ({ ...prev, active: 1 }))}
             className={
               sensorData.active
                 ? "border  w-1/3 p-2.5 rounded border-green bg-[#20E0800D]"
@@ -211,9 +221,7 @@ export default function StepThree({
             فعال
           </button>
           <button
-            onClick={() =>
-              setSensorData((prev) => ({ ...prev, active: false }))
-            }
+            onClick={() => setSensorData((prev) => ({ ...prev, active: 0 }))}
             className={
               sensorData.active
                 ? "border border-border-muted w-1/3 p-2.5 rounded bg-[#C1C1C133]"
@@ -240,7 +248,7 @@ export default function StepThree({
       </div>
       <div className="flex items-center justify-between px-3 py-3.5 ">
         <button
-          onClick={handleSetSensor}
+          onClick={handleAddSensors}
           className="border border-border-muted w-full p-2.5 rounded bg-[#C1C1C133]"
         >
           ثبت سنسور{" "}

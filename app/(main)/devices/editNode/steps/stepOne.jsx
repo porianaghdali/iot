@@ -1,14 +1,32 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import CustomInput from "../../../../../components/ui/customInput";
 import CustomSelect from "../../../../../components/ui/customSelect";
 import useMqtt from "@/hooks/useMqtt";
+import { useZones } from "@/hooks/useZones";
+import { getTokenFromCookie } from "@/utils/functions/auth";
 
-export default function StepOne({ formData, handleChange, zoneList }) {
+export default function StepOne({ formData, handleChange }) {
+  const token = useMemo(() => getTokenFromCookie("token"), []);
+
+  /* ---------------- ZONES ---------------- */
+
+  const { zones, getZonesList } = useZones(token);
+
+  useEffect(() => {
+    getZonesList();
+  }, [getZonesList]);
+
+  const zoneOptions = zones.map((z) => ({
+    label: z.zoneName,
+    value: z.zoneName,
+  }));
+  /* ---------------- MQTT ---------------- */
   const { publish, subscribe, onMessage, offMessage, connected } = useMqtt();
   const [pingStatus, setPingStatus] = useState("idle");
   const [latency, setLatency] = useState(null);
   const macStatusRef = useRef("idle");
+  /* ---------------- HELPERS ---------------- */
   const setMacStatusSafe = (status) => {
     macStatusRef.current = status;
   };
@@ -17,10 +35,7 @@ export default function StepOne({ formData, handleChange, zoneList }) {
     pingStatusRef.current = status;
     setPingStatus(status);
   };
-  const zoneOptions = zoneList.map((item) => ({
-    label: item.zoneName,
-    value: item.zoneName,
-  }));
+
   // subscribe به topic جواب ping
   useEffect(() => {
     if (!connected) return;
@@ -53,7 +68,7 @@ export default function StepOne({ formData, handleChange, zoneList }) {
 
     setPingStatusSafe("loading");
 
-    const pingPullTopic = `data/${formData.department || "default"}/${formData.zone || "default"}/node/${formData.sensor || "default"}/Network/ping/pull`;
+    const pingPullTopic = `data/{department}/{zone}/node/{sensor}/Network/ping/pull`;
     // data/{department}/{zone}/"node"/{sensor}/Network/ping/pull
     const payload = JSON.stringify({
       ip: formData.ip,
