@@ -14,8 +14,7 @@ export default function StepThree({
   handleAddSensors,
 }) {
   const token = useMemo(() => getTokenFromCookie("token"), []);
-  const {  getTypes, sensorTypes } =
-    useSensors(token, formData.ID);
+  const { getTypes, sensorTypes, } = useSensors(token, formData.ID);
 
   useEffect(() => {
     getTypes();
@@ -88,6 +87,7 @@ export default function StepThree({
 
     setSensorData((prev) => ({
       ...prev,
+      node: formData.ID,
       type: value,
       oid: sensor.oid,
     }));
@@ -183,7 +183,7 @@ export default function StepThree({
         <div className="flex gap-1 w-full max-w-[372px] items-center justify-end">
           <button
             onClick={() =>
-              setSensorData((prev) => ({ ...prev, historySave: true }))
+              setSensorData((prev) => ({ ...prev, historySave: 1 }))
             }
             className={
               sensorData.historySave
@@ -195,7 +195,7 @@ export default function StepThree({
           </button>
           <button
             onClick={() =>
-              setSensorData((prev) => ({ ...prev, historySave: false }))
+              setSensorData((prev) => ({ ...prev, historySave: 0 }))
             }
             className={
               sensorData.historySave
@@ -211,7 +211,7 @@ export default function StepThree({
         <label className="text-text-title text-sm font-normal"> وضعیت </label>
         <div className="flex gap-1 w-full max-w-[372px] items-center justify-end">
           <button
-            onClick={() => setSensorData((prev) => ({ ...prev, active: true }))}
+            onClick={() => setSensorData((prev) => ({ ...prev, active: 1 }))}
             className={
               sensorData.active
                 ? "border  w-1/3 p-2.5 rounded border-green bg-[#20E0800D]"
@@ -221,9 +221,7 @@ export default function StepThree({
             فعال
           </button>
           <button
-            onClick={() =>
-              setSensorData((prev) => ({ ...prev, active: false }))
-            }
+            onClick={() => setSensorData((prev) => ({ ...prev, active: 0 }))}
             className={
               sensorData.active
                 ? "border border-border-muted w-1/3 p-2.5 rounded bg-[#C1C1C133]"

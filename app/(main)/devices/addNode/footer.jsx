@@ -1,31 +1,21 @@
 "use client";
-import { useNodes } from "@/hooks/useNodes";
-import { getTokenFromCookie } from "@/utils/functions/auth";
-import { useMemo } from "react";
 
-export default function Footer({ setStep, step, formData, setFormData }) {
-  const token = useMemo(() => getTokenFromCookie("token"), []);
+export default function Footer({
+  setStep,
+  step,
 
-  const { createNode } = useNodes(token);
-  const handleSaveNode = async () => {
-    const newId = await createNode(formData);
-    if (newId) {
-      setFormData((p) => ({ ...p, ID: newId }));
-    }
-    return newId; // 🔹 برگردوندن ID
-  };
-
+  handleSaveNode,
+  handleSaveAllSensors,
+}) {
   const handleSubmit = async () => {
     const newId = await handleSaveNode();
-    
+
     if (newId) {
       // حالا می‌تونی مستقیماً از newId استفاده کنی
     }
     setStep(step + 1); // بعد از اینکه ID مطمئناً آماده شد
   };
 
-
-  
   return (
     <div className="flex justify-between items-center mt-6 ">
       <button
@@ -53,7 +43,7 @@ export default function Footer({ setStep, step, formData, setFormData }) {
           </button>
         ) : (
           <button
-            // onClick={handleSetSensor}
+            onClick={handleSaveAllSensors}
             className="text-xs px-3 py-1 bg-black text-white rounded"
           >
             ثبت

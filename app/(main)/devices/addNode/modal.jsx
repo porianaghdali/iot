@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
 import SensorList from "./sensorList";
 import StepOne from "./steps/stepOne";
 import StepTwo from "./steps/stepTwo";
@@ -5,9 +8,10 @@ import StepThree from "./steps/stepThree";
 import Header from "./header";
 import Footer from "./footer";
 import LeftImage from "./leftImage";
+
 import { useSensors } from "@/hooks/useSensors";
 import { getTokenFromCookie } from "@/utils/functions/auth";
-import { useEffect, useMemo, useState } from "react";
+
 const initialSensorData = {
   ID: "",
   type: "",
@@ -16,29 +20,38 @@ const initialSensorData = {
   dataType: "",
   dataAddress: "",
   oid: "",
-  historySave: false,
-  active: false,
+  historySave: 0,
+  active: 0,
+  mqttValue:""
 };
 export default function AddDeviceModal({
   open,
-  formData,setFormData,
+  formData,
+  setFormData,
   handleClose,
   step,
   setStep,
-  
+  handleSaveNode,
   onSaveSensors,
   handleChange,
 }) {
   const token = useMemo(() => getTokenFromCookie("token"), []);
-  useEffect(() => {
-    getList();
-  }, [formData.ID]);
-  const { getList } = useSensors(token, formData.ID);
+
+  const { getList, sensorList, createSensors } = useSensors(token);
+
+  // Current sensor form
   const [sensorData, setSensorData] = useState(initialSensorData);
-  const [sensorsState, setSensorsState] = useState([]);
 
-  if (!open) return null;
+  // Sensors waiting to be saved
+  const [pendingSensors, setPendingSensors] = useState([]);
 
+  // Fetch sensors when node ID exists
+  useEffect(() => {
+    if (!formData.ID) return;
+    getList(formData.ID);
+  }, [formData.ID, getList]);
+
+  // Handle sensor input change
   const handleSensorChange = (e) => {
     const { name, value } = e.target;
 
@@ -46,12 +59,29 @@ export default function AddDeviceModal({
       ...prev,
       [name]: value,
     }));
-  };const handleAddSensor = () => {
-  setSensorsState((prev) => [...prev, sensorData]);
+  };
 
-  // اختیاری — ریست فرم برای سنسور بعدی
-  setSensorData(initialSensorData);
-};
+  // Add sensor to pending list
+  const handleAddSensor = () => {
+    const sensor = {
+      ...sensorData,
+      node: formData.ID, // attach node id
+    };
+
+    setPendingSensors((prev) => [...prev, sensor]);
+    setSensorData(initialSensorData);
+  };
+
+  // Save all sensors to server
+  const handleSaveAllSensors = async () => {
+    if (!formData.ID || !pendingSensors.length) return;
+
+    await createSensors(pendingSensors, formData.ID);
+    await getList(formData.ID);
+
+    setPendingSensors([]);
+    handleClose();
+  };
   const steps = {
     1: <StepOne formData={formData} handleChange={handleChange} />,
     2: <StepTwo formData={formData} handleChange={handleChange} />,
@@ -65,8 +95,7 @@ export default function AddDeviceModal({
       />
     ),
   };
-  
-
+  if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
@@ -80,23 +109,21 @@ export default function AddDeviceModal({
           <Footer
             step={step}
             setStep={setStep}
-            onClose={handleClose}
-            formData={formData}
-            onSaveSensors={onSaveSensors}
-            setFormData={setFormData}
+            handleSaveNode={handleSaveNode}
+            handleSaveAllSensors={handleSaveAllSensors}
           />
         </div>
 
-        {/* {step === 3 ? (
+        {step === 3 ? (
           <SensorList
             sensorList={sensorList}
-            sensorsState={sensorsState}
-            setSensorsState={setSensorsState}
-            handleGetSensorList={handleGetSensorList}
+            pendingSensors={pendingSensors}
+            setPendingSensors={setPendingSensors}
+            // handleGetSensorList={handleGetSensorList}
           />
         ) : (
           <LeftImage />
-        )} */}
+        )}
       </div>
     </div>
   );

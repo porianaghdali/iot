@@ -1,27 +1,80 @@
-"use client"
+"use client";
 import { useState } from "react";
-import { DeleteNodes, getNodes, setNodes } from "../app/api/fetchNode"; // setNodes اضافه شد
+import {
+  DeleteNodes as deleteNodeApi,
+  getNodes as fetchNodesApi,
+  setNodes as createNodeApi,
+} from "../app/api/fetchNode";
 
 export function useNodes(token) {
-  const [nodes, setNodesState] = useState([]); // تغییر اسم به setNodesState برای جلوگیری از تداخل
+  const [nodes, setNodes] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const getNodesList = async () => {
-    const res = await getNodes({ token });
-    if (res?.errorCode === 0) setNodesState(res.data);
-  };
+  // 🔹 Fetch all nodes
+  const fetchNodes = async () => {
+    setLoading(true);
+    setError(null);
 
-  const createNode = async (formData) => {
-    const res = await setNodes({ formData, token });
-    if (res?.errorCode === 0) {
-      await getNodesList();
-      return res.ID;
+    try {
+      const res = await fetchNodesApi({ token });
+
+      if (res?.errorCode === 0) {
+        setNodes(res.data || []);
+      } else {
+        setNodes([]);
+      }
+    } catch (err) {
+      setError(err);
+      setNodes([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const deleteNode = async (ID) => {
-    const res = await DeleteNodes({ ID,  token});
-    if (res?.errorCode === 0) await getNodesList();
+  // 🔹 Create new node
+  const createNode = async (formData) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await createNodeApi({ formData, token });
+
+      if (res?.errorCode === 0) {
+        await fetchNodes(); // refresh list
+        return res.ID;
+      }
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return { nodes, getNodesList, createNode, deleteNode };
+  // 🔹 Delete node
+  const deleteNode = async (ID) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await deleteNodeApi({ ID, token });
+
+      if (res?.errorCode === 0) {
+        await fetchNodes();
+      }
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    nodes,
+    loading,
+    error,
+    fetchNodes,
+    createNode,
+    deleteNode,
+  };
 }

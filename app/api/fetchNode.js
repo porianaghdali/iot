@@ -27,7 +27,6 @@ export async function setNodes({ formData, token }) {
 }
 export async function getNodes({ token }) {
   const url = "https://192.168.30.20/ems3/web/api/user/node/list";
-
   try {
     const response = await fetch(url, {
       method: "POST",

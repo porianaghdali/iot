@@ -1,7 +1,7 @@
 "use client";
 import { Plus } from "lucide-react";
 
-export default function DevicesHeader({ setIsOpen }) {
+export default function DevicesHeader({ openCreateModal }) {
   return (
     <>
       <div className="p-4 flex justify-between items-center w-full  bg-background-box border-b border-border-main">
@@ -14,7 +14,7 @@ export default function DevicesHeader({ setIsOpen }) {
             معماری شبکه{" "}
           </button>
           <button
-            onClick={() => setIsOpen(true)}
+            onClick={openCreateModal}
             className="font-normal text-sm text-text-title  bg-background-button px-5 py-1.5 rounded-[50px] flex items-center"
           >
             <Plus />

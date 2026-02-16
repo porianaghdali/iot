@@ -9,15 +9,24 @@ import { getTokenFromCookie } from "@/utils/functions/auth";
 export default function StepOne({ formData, handleChange }) {
   const token = useMemo(() => getTokenFromCookie("token"), []);
 
+  /* ---------------- ZONES ---------------- */
+
   const { zones, getZonesList } = useZones(token);
+
   useEffect(() => {
     getZonesList();
-  }, []);
+  }, [getZonesList]);
 
+  const zoneOptions = zones.map((z) => ({
+    label: z.zoneName,
+    value: z.zoneName,
+  }));
+  /* ---------------- MQTT ---------------- */
   const { publish, subscribe, onMessage, offMessage, connected } = useMqtt();
   const [pingStatus, setPingStatus] = useState("idle");
   const [latency, setLatency] = useState(null);
   const macStatusRef = useRef("idle");
+  /* ---------------- HELPERS ---------------- */
   const setMacStatusSafe = (status) => {
     macStatusRef.current = status;
   };
@@ -26,10 +35,6 @@ export default function StepOne({ formData, handleChange }) {
     pingStatusRef.current = status;
     setPingStatus(status);
   };
-  const zoneOptions = zones.map((item) => ({
-    label: item.zoneName,
-    value: item.zoneName,
-  }));
 
   // subscribe به topic جواب ping
   useEffect(() => {

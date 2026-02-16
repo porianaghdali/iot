@@ -3,12 +3,11 @@ import DevicesHeader from "./devicesHeader";
 import { Delete, Edit, ListFilter } from "lucide-react";
 import AddNodeModal from "./addNode/modal";
 import EditNodeModal from "./editNode/modal";
-
 import { getTokenFromCookie } from "@/utils/functions/auth";
 import { useNodes } from "@/hooks/useNodes";
 import { useEffect, useMemo, useState } from "react";
 
-const initialFormData = {
+const initialNodeFormData = {
   ID: "",
   deviceName: "",
   active: "",
@@ -30,46 +29,40 @@ const initialFormData = {
   },
 };
 
-const list = [
+const tableHeaders = [
   { id: 1, title: "ردیف" },
   { id: 2, title: "نام" },
-  { id: 3, title: "ناحیه " },
+  { id: 3, title: "ناحیه" },
   { id: 4, title: "IP" },
   { id: 5, title: "نوع" },
   { id: 6, title: "Community" },
-  { id: 7, title: " آخرین اتصال" },
+  { id: 7, title: "آخرین اتصال" },
   { id: 8, title: "وضعیت" },
 ];
+
 export default function Systems() {
   const token = useMemo(() => getTokenFromCookie("token"), []);
 
-  // modal
-  const [isOpen, setIsOpen] = useState(false);
-  const [isOpenEdit, setIsOpenEdit] = useState(false);
+  // Modal states
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  // steps
-  const [step, setStep] = useState(1);
+  // Form steps
+  const [createStep, setCreateStep] = useState(1);
   const [editStep, setEditStep] = useState(1);
 
-  // forms
-  const [formData, setFormData] = useState(initialFormData);
+  // Form data
+  const [nodeFormData, setNodeFormData] = useState(initialNodeFormData);
 
-  const { nodes, getNodesList, deleteNode } = useNodes(token);
-
-
-
-
+  const { nodes, loading, error, fetchNodes, createNode, deleteNode } =
+    useNodes(token);
 
   useEffect(() => {
-    getNodesList();
+    fetchNodes();
   }, []);
 
-  
-
-
-
- const handleChange = (path, value) => {
-    setFormData((prev) => {
+  const handleChange = (path, value) => {
+    setNodeFormData((prev) => {
       const updated = { ...prev };
       let current = updated;
 
@@ -81,102 +74,112 @@ export default function Systems() {
       current[path[path.length - 1]] = value;
       return updated;
     });
-  }; 
-  const handleOpenEdit = (item) => {
-    setFormData(item);
-    setIsOpenEdit(true);
   };
-  const handleClose = () => {
-    setFormData(initialFormData);
-    setStep(1);
-    setIsOpen(false);
+  //Modal handler
+  const openCreateModal = () => {
+    setIsCreateModalOpen(true);
   };
-
-  const handleEditClose = () => {
-    setFormData(initialFormData);
+  const openEditModal = (node) => {
+    setNodeFormData(node);
+    setIsEditModalOpen(true);
+  };
+  const closeCreateModal = () => {
+    setNodeFormData(initialNodeFormData);
+    setCreateStep(1);
+    setIsCreateModalOpen(false);
+  };
+  const closeEditModal = () => {
+    setNodeFormData(initialNodeFormData);
     setEditStep(1);
-    setIsOpenEdit(false);
+    setIsEditModalOpen(false);
   };
-
+  //Save Node
+  const saveNode = async () => {
+    const newId = await createNode(nodeFormData);
+    if (newId) {
+      setNodeFormData((prev) => ({ ...prev, ID: newId }));
+    }
+    return newId;
+  };
+  if (loading) return <div>loading...</div>;
   return (
-    <div className="w-full bg-background-main h-[calc(100vh-64px)] overflow-auto ">
-      {/* //header */}
-      <DevicesHeader setIsOpen={setIsOpen} />
-      {/* //filter section */}
-      <div className="flex items-center justify-between bg-background-box  p-3 w-full">
-        <div className="flex items-center  gap-2.5 ">
+    <div className="w-full bg-background-main h-[calc(100vh-64px)] overflow-auto">
+      <DevicesHeader openCreateModal={openCreateModal} />
+
+      {/* Filter Section */}
+      <div className="flex items-center justify-between bg-background-box p-3 w-full">
+        <div className="flex items-center gap-2.5">
           <select
-            name="1"
-            id=""
+            name="zone"
             className="border border-border-muted rounded-sm w-[114px] text-text-tertiary text-xs font-normal"
           >
             <option value="ناحیه">ناحیه</option>
           </select>
-          <button className="   text-xs font-normal flex items-center gap-2">
+          <button className="text-xs font-normal flex items-center gap-2">
             <ListFilter size={18} />
             <p className="text-[#0000004D]">فیلتر</p>
           </button>
         </div>
-        <button className="text-text-title font-normal text-xs border border-border-muted px-3 py-1.5 rounded-sm ">
+        <button className="text-text-title font-normal text-xs border border-border-muted px-3 py-1.5 rounded-sm">
           تنظیم میانگین
         </button>
       </div>
-      {/* //table nodes */}
+
+      {/* Nodes Table */}
       <div>
         <table className="min-w-full border border-gray-300 bg-background-box">
-          <thead className="">
+          <thead>
             <tr>
               <th className="border-b border-border-main px-4 py-3 text-center text-text-title text-xs font-normal">
                 <div className="w-4 h-4 rounded-xs border mx-auto border-[#9E9E9E]"></div>
               </th>
-              {list.map((item) => (
+              {tableHeaders.map((header) => (
                 <th
-                  key={item.id}
+                  key={header.id}
                   className="border-b border-border-main px-4 py-3 text-center text-text-title text-xs font-normal"
                 >
-                  {item.title}
+                  {header.title}
                 </th>
               ))}
               <th className="border-b border-border-main px-4 py-3 text-center text-text-title text-xs font-normal"></th>
             </tr>
           </thead>
           <tbody>
-            {nodes.map((item, key) => (
-              <tr key={item.ID}>
-                <td className="border-b border-border-main px-4 py-3 text-center  text-text-tertiary text-xs font-normal">
+            {nodes.map((node, index) => (
+              <tr key={node.ID}>
+                <td className="border-b border-border-main px-4 py-3 text-center text-text-tertiary text-xs font-normal">
                   <div className="w-4 h-4 rounded-xs border border-[#9E9E9E] mx-auto"></div>
                 </td>
                 <td className="border-b border-border-main px-4 py-3 text-center text-text-tertiary text-xs font-normal">
-                  {key + 1}
+                  {index + 1}
                 </td>
                 <td className="border-b border-border-main px-4 py-3 text-center text-text-tertiary text-xs font-normal">
-                  {item.deviceName}
+                  {node.deviceName}
                 </td>
                 <td className="border-b border-border-main px-4 py-3 text-center text-text-tertiary text-xs font-normal">
-                  {item.zone}
+                  {node.zone}
                 </td>
                 <td className="border-b border-border-main px-4 py-3 text-center text-text-tertiary text-xs font-normal">
-                  {item.ip}
+                  {node.ip}
                 </td>
                 <td className="border-b border-border-main px-4 py-3 text-center text-text-tertiary text-xs font-normal">
-                  {item.protocol}
+                  {node.protocol}
                 </td>
                 <td className="border-b border-border-main px-4 py-3 text-center text-text-tertiary text-xs font-normal">
-                  {item.config?.community ? item.config.community : "-"}
+                  {node.config?.community || "-"}
                 </td>
                 <td className="border-b border-border-main px-4 py-3 text-center text-text-tertiary text-xs font-normal">
-                  {item.lastLogin}
+                  {node.lastLogin}
                 </td>
                 <td className="border-b border-border-main px-4 py-3 text-center text-text-tertiary text-xs font-normal">
-                  {item.active}
+                  {node.active}
                 </td>
-                <td className="border-b border-border-main  text-center text-text-tertiary text-xs font-normal">
-                  <div className=" flex gap-4  px-4 py-3 ">
-                    <button onClick={() => handleOpenEdit(item)}>
+                <td className="border-b border-border-main text-center text-text-tertiary text-xs font-normal">
+                  <div className="flex gap-4 px-4 py-3">
+                    <button onClick={() => openEditModal(node)}>
                       <Edit size={16} className="mx-auto cursor-pointer" />
                     </button>
-
-                    <button onClick={() => deleteNode(item.ID)}>
+                    <button onClick={() => deleteNode(node.ID)}>
                       <Delete size={16} className="mx-auto cursor-pointer" />
                     </button>
                   </div>
@@ -186,22 +189,25 @@ export default function Systems() {
           </tbody>
         </table>
       </div>
+
+      {/* Modals */}
       <AddNodeModal
-        formData={formData}
-        open={isOpen}
-        step={step}
-        setStep={setStep}
-        handleClose={handleClose}
+        open={isCreateModalOpen}
+        formData={nodeFormData}
+        step={createStep}
+        handleSaveNode={saveNode}
+        setStep={setCreateStep}
+        handleClose={closeCreateModal}
         handleChange={handleChange}
-        setFormData={setFormData}
+        setFormData={setNodeFormData}
       />
 
       <EditNodeModal
-        formData={formData}
-        open={isOpenEdit}
+        formData={nodeFormData}
+        open={isEditModalOpen}
         step={editStep}
         setStep={setEditStep}
-        handleClose={handleEditClose}
+        handleClose={closeEditModal}
         handleChange={handleChange}
       />
     </div>

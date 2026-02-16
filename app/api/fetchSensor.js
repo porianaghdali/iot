@@ -1,4 +1,4 @@
-export async function getSensorType({  token }) {
+export async function getSensorType({ token }) {
   const url = "https://192.168.30.20/ems3/web/api/user/sensor/type";
 
   try {
@@ -14,18 +14,19 @@ export async function getSensorType({  token }) {
     throw error;
   }
 }
-export async function getSensorList({  token,ID }) {
+export async function getSensorList({ token, node }) {
   const url = "https://192.168.30.20/ems3/web/api/user/sensor/list";
 
   try {
-        const formBody = new URLSearchParams({ ID }).toString();
+    const formBody = new URLSearchParams({ node }).toString();
 
     const response = await fetch(url, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`, // اضافه شد
-      },      body: formBody,
-
+                "Content-Type": "application/x-www-form-urlencoded",  
+      },
+      body: formBody,
     });
     return await response.json();
   } catch (error) {
@@ -36,8 +37,8 @@ export async function getSensorList({  token,ID }) {
 export async function setSensor({ formData, token }) {
   const url = "https://192.168.30.20/ems3/web/api/user/sensor/set";
   if (!url) throw new Error("Invalid function code");
-  
-const fd = new FormData();
+
+  const fd = new FormData();
   for (const key in formData) {
     // اگر مقدار object بود مثل config، باید stringify کنیم
     if (typeof formData[key] === "object") {
@@ -70,7 +71,7 @@ export async function DeleteSensor({ token, ID }) {
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: formBody,
