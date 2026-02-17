@@ -28,7 +28,7 @@ export default function Card({ zone }) {
     <div className="bg-background-box py-3 px-4 w-full rounded-xs  ">
       <div className="flex justify-between items-center mb-3.5">
         <div className="flex gap-2 items-center">
-          <p className="text-text-title text-sx font-normal">اتاق نرم افزار</p>
+          <p className="text-text-title text-sx font-normal">  {zone.zoneName}</p>
           <p
             className={`text-text-title text-[10px] font-normal rounded-[50px] w-fit
            px-[11px] py-0.5 border ${zone.active ? "border-green bg-[#20E0801A]" : "border-red bg-[#FF46461A]"}  `}

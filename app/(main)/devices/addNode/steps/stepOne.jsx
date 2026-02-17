@@ -15,11 +15,10 @@ export default function StepOne({ formData, handleChange }) {
 
   useEffect(() => {
     getZonesList();
-  }, [getZonesList]);
-
+  }, []);
   const zoneOptions = zones.map((z) => ({
     label: z.zoneName,
-    value: z.zoneName,
+    value: z.ID,
   }));
   /* ---------------- MQTT ---------------- */
   const { publish, subscribe, onMessage, offMessage, connected } = useMqtt();

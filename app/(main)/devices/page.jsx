@@ -1,6 +1,6 @@
 "use client";
 import DevicesHeader from "./devicesHeader";
-import { Delete, Edit, ListFilter } from "lucide-react";
+import { Bell, Copy, Delete, Edit, ListFilter } from "lucide-react";
 import AddNodeModal from "./addNode/modal";
 import EditNodeModal from "./editNode/modal";
 import { getTokenFromCookie } from "@/utils/functions/auth";
@@ -120,9 +120,6 @@ export default function Systems() {
             <p className="text-[#0000004D]">فیلتر</p>
           </button>
         </div>
-        <button className="text-text-title font-normal text-xs border border-border-muted px-3 py-1.5 rounded-sm">
-          تنظیم میانگین
-        </button>
       </div>
 
       {/* Nodes Table */}
@@ -176,8 +173,15 @@ export default function Systems() {
                 </td>
                 <td className="border-b border-border-main text-center text-text-tertiary text-xs font-normal">
                   <div className="flex gap-4 px-4 py-3">
+                    <button onClick={() => deleteNode(node.ID)}>
+                      <Bell size={16} className="mx-auto cursor-pointer" />
+                    </button>
                     <button onClick={() => openEditModal(node)}>
                       <Edit size={16} className="mx-auto cursor-pointer" />
+                    </button>
+
+                    <button onClick={() => deleteNode(node.ID)}>
+                      <Copy size={16} className="mx-auto cursor-pointer" />
                     </button>
                     <button onClick={() => deleteNode(node.ID)}>
                       <Delete size={16} className="mx-auto cursor-pointer" />

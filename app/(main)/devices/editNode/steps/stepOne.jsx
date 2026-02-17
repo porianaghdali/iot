@@ -13,9 +13,9 @@ export default function StepOne({ formData, handleChange }) {
 
   const { zones, getZonesList } = useZones(token);
 
-  useEffect(() => {
-    getZonesList();
-  }, [getZonesList]);
+  // useEffect(() => {
+  //   getZonesList();
+  // }, []);
 
   const zoneOptions = zones.map((z) => ({
     label: z.zoneName,

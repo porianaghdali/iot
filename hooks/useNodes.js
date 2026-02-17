@@ -12,12 +12,12 @@ export function useNodes(token) {
   const [error, setError] = useState(null);
 
   // 🔹 Fetch all nodes
-  const fetchNodes = async () => {
+  const fetchNodes = async (zone) => {
     setLoading(true);
     setError(null);
 
     try {
-      const res = await fetchNodesApi({ token });
+      const res = await fetchNodesApi({ token,zone });
 
       if (res?.errorCode === 0) {
         setNodes(res.data || []);
