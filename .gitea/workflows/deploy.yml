@@ -25,5 +25,5 @@ jobs:
       - name: Deploy to Windows server
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no alikhalili@192.168.30.20 \
-          "cd C:\\xampp\\htdocs\\frontend && git reset --hard && git clean -fd && git pull && npm i && npm run build && npm start && net stop \"Sepehr EMS 3\" && net start \"Sepehr EMS 3\""
+          "cd C:\\xampp\\htdocs\\frontend && git reset --hard && git clean -fd && git pull && npm i && npm run build && net stop \"Sepehr EMS 3\" && net start \"Sepehr EMS 3\""
 
