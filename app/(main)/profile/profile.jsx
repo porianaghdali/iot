@@ -5,8 +5,9 @@ import Manager from "./manager";
 import Password from "./password";
 import { useRouter } from "next/navigation";
 import LoginHistory from "./loginHistory";
+import LogOut from "./logOut";
 export default function Profile({ openProfile, setOpenProfile }) {
-    const router = useRouter();
+  const router = useRouter();
   const [selectedItem, setSelectedItem] = useState(null);
 
   const list = [
@@ -18,6 +19,7 @@ export default function Profile({ openProfile, setOpenProfile }) {
     { id: 6, title: "خروج", icon: <User /> },
   ];
   const handleLogout = () => {
+    console.log("first")
     // پاک کردن توکن‌ها از کوکی
     document.cookie = "token=; path=/; max-age=0";
     document.cookie = "auth=; path=/; max-age=0";
@@ -33,7 +35,7 @@ export default function Profile({ openProfile, setOpenProfile }) {
     switch (item) {
       //login history
       case 1:
-        return <LoginHistory setSelectedItem={setSelectedItem}/>;
+        return <LoginHistory setSelectedItem={setSelectedItem} />;
       //edit profile
       case 2:
         return (
@@ -47,7 +49,7 @@ export default function Profile({ openProfile, setOpenProfile }) {
         );
       //change password
       case 3:
-        return <Password setSelectedItem={setSelectedItem}/>;
+        return <Password setSelectedItem={setSelectedItem} />;
       // two step auth
       case 4:
         return <p>فعال‌سازی ورود دو مرحله‌ای (OTP / Google Auth)…</p>;
@@ -56,17 +58,10 @@ export default function Profile({ openProfile, setOpenProfile }) {
         return <p>راهنمای استفاده از سامانه...</p>;
       // logout
       case 6:
-        return (
-          <div className=" relative z-40">
-            <p>آیا از حساب کاربری خارج می‌شوید؟</p>
-            <button onClick={handleLogout} className="bg-red-600 text-white mt-4 py-2 rounded">
-              خروج
-            </button>
-          </div>
-        );
+        return <LogOut handleLogout={handleLogout} closeModal={() => setSelectedItem(null)}/>;
       // profile
       case 7:
-        return <Manager setSelectedItem={setSelectedItem}/>
+        return <Manager setSelectedItem={setSelectedItem} />;
       default:
         return null;
     }
@@ -81,7 +76,7 @@ export default function Profile({ openProfile, setOpenProfile }) {
           className="fixed inset-0 bg-black/40 z-10"
         />
       )}
- 
+
       {/* باکس پروفایل */}
       {openProfile && (
         <div className="absolute top-14 left-0 w-60 bg-background-box shadow-lg rounded-sm flex flex-col z-20">
@@ -130,8 +125,6 @@ export default function Profile({ openProfile, setOpenProfile }) {
           ></div>
 
           {renderModalContent(selectedItem)}
-
-        
         </div>
       )}
     </>

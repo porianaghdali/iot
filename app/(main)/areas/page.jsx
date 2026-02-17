@@ -5,10 +5,18 @@ import { useEffect, useState } from "react";
 import { getTokenFromCookie } from "@/utils/functions/auth.js";
 
 import { getZone } from "../../api/fetchZone";
+import AddZoneModal from "./addZone/modal";
+const initialZoneFormData = {
+  ID: "",
+  ZoneName: "",
+  type: "",
+};
 export default function Areas() {
   const [zoneList, setZoneList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [zoneFormData, setZoneFormData] = useState(initialZoneFormData);
 
   const handleGetZone = async () => {
     setLoading(true);
@@ -33,9 +41,20 @@ export default function Areas() {
   useEffect(() => {
     handleGetZone();
   }, []);
+  const openCreateModal = () => {
+    setIsCreateModalOpen(true);
+  };
+  const closeCreateModal = () => {
+    setIsCreateModalOpen(false);
+  };
+  if (loading) return <div>loading...</div>;
   return (
     <div className="w-full bg-background-main h-[calc(100vh-64px)] overflow-auto ">
-      <AreasHeader />
+      <AreasHeader openCreateModal={openCreateModal} />
+      <AddZoneModal
+        open={isCreateModalOpen}
+        closeCreateModal={closeCreateModal}
+      />
       <div className="p-4 flex gap-1.5 w-full ">
         <div className="grid grid-cols-3 gap-1.5 w-full">
           {zoneList.length ? (

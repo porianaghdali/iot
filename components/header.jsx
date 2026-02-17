@@ -26,10 +26,7 @@ export default function Header({ toggleSidebar }) {
       <div className="flex items-center gap-6 text-text-title relative">
         {/* <LanguageSwitcher/> */}
         <ThemeToggle />
-        <button>
-          <CircleAlert strokeWidth={1.25} />
-        </button>
-
+       
         <button onClick={() => setOpenNotifications(!openNotifications)}>
           <Bell strokeWidth={1.25} />
         </button>
