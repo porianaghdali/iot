@@ -1,9 +1,8 @@
-"use client"
+"use client";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import ChartsHeader from "./chartsHeader";
 import Image from "next/image";
 import Filter from "./components/filter";
-import LineChart from "@/components/charts/line";
 import IrregularTimeChart from "./lineChart";
 export default function Charts() {
   return (
@@ -49,7 +48,8 @@ export default function Charts() {
             <Filter />
           </div>
           <div className="w-4/5 mx-auto max-h-[372px] ">
-          <IrregularTimeChart/></div>
+            <IrregularTimeChart />
+          </div>
         </div>
       </div>
     </div>

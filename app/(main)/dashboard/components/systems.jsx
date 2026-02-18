@@ -1,5 +1,4 @@
 import { EllipsisVertical } from "lucide-react";
-import DonutHalf from "@/components/charts/doughnut";
 const list = [
   {
     id: 1,

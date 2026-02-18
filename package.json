@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "chart.js": "^4.5.1",
     "highcharts": "^12.5.0",
     "highcharts-react-official": "^3.2.3",
     "lucide-react": "^0.556.0",

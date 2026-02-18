@@ -40,13 +40,15 @@ export default function AddDeviceModal({
   const token = useMemo(() => getTokenFromCookie("token"), []);
   const { publish, subscribe, onMessage, offMessage, connected } = useMqtt();
 
-  const { getList, sensorList, createSensors,deleteSensorById } = useSensors(token);
+  const { getList, sensorList, createSensors, deleteSensorById } =
+    useSensors(token);
 
   // Current sensor form
   const [sensorData, setSensorData] = useState(initialSensorData);
 
   // Sensors waiting to be saved
   const [pendingSensors, setPendingSensors] = useState([]);
+  console.log(pendingSensors,"pendingSensors")
   const [scanResult, setScanResult] = useState(null);
   const [scanStatus, setScanStatus] = useState("idle");
 
@@ -56,55 +58,54 @@ export default function AddDeviceModal({
     scanStatusRef.current = status;
     setScanStatus(status);
   };
-const handleSensorScan = () => {
-  if (!connected) {
-    return;
-  }
+  const handleSensorScan = () => {
+    if (!connected) {
+      return;
+    }
 
-  setScanStatusSafe("loading");
+    setScanStatusSafe("loading");
 
-  // 🔹 topic ثابت
-  const pullTopic = `web/{department}/user/1/sensor-scan/${formData.ID}/pull`;
-  const responseTopic = `web/{department}/user/1/sensor-scan/${formData.ID}/get`;
+    // 🔹 topic ثابت
+    const pullTopic = `web/{department}/user/1/sensor-scan/${formData.ID}/pull`;
+    const responseTopic = `web/{department}/user/1/sensor-scan/${formData.ID}/get`;
 
-  // subscribe به جواب
-  subscribe(responseTopic);
+    // subscribe به جواب
+    subscribe(responseTopic);
 
-  const handleMessage = (msg) => {
-    console.log("received topic:", msg.destinationName);
-    console.log("payload:", msg.payloadString);
+    const handleMessage = (msg) => {
 
-    if (msg.destinationName !== responseTopic) return;
 
-    const result = msg.payloadString;
-    if (result) {
-      setScanStatusSafe("success");
-      try {
-        setScanResult(JSON.parse(result));
-      } catch {
-        setScanResult(result);
+      if (msg.destinationName !== responseTopic) return;
+
+      const result = msg.payloadString;
+      if (result) {
+        setScanStatusSafe("success");
+        try {
+          setScanResult(JSON.parse(result));
+        } catch {
+          setScanResult(result);
+        }
+      } else {
+        setScanStatusSafe("fail");
+        setScanResult(null);
       }
-    } else {
-      setScanStatusSafe("fail");
-      setScanResult(null);
-    }
 
-    offMessage(handleMessage); // cleanup بعد از دریافت پیام
+      offMessage(handleMessage); // cleanup بعد از دریافت پیام
+    };
+
+    onMessage(handleMessage);
+
+    // 🔹 publish درخواست scan
+    publish(pullTopic, JSON.stringify({}), { qos: 2 });
+
+    // 🔹 timeout برای جلوگیری از گیر کردن
+    setTimeout(() => {
+      if (scanStatusRef.current === "loading") {
+        setScanStatusSafe("fail");
+        offMessage(handleMessage);
+      }
+    }, 7000);
   };
-
-  onMessage(handleMessage);
-
-  // 🔹 publish درخواست scan
-  publish(pullTopic, JSON.stringify({}), { qos: 2 });
-
-  // 🔹 timeout برای جلوگیری از گیر کردن
-  setTimeout(() => {
-    if (scanStatusRef.current === "loading") {
-      setScanStatusSafe("fail");
-      offMessage(handleMessage);
-    }
-  }, 7000);
-};
 
   // Fetch sensors when node ID exists
   useEffect(() => {
@@ -144,7 +145,7 @@ const handleSensorScan = () => {
     // handleClose();
   };
   const handleDeletSensors = async (ID) => {
-    if (!formData.ID ) return;
+    if (!formData.ID) return;
 
     await deleteSensorById(ID, formData.ID);
     await getList(formData.ID);
@@ -192,10 +193,13 @@ const handleSensorScan = () => {
         </div>
         {step === 3 ? (
           <SensorList
-            sensorList={sensorList}formData={formData}
+            sensorList={sensorList}
+            formData={formData}
             pendingSensors={pendingSensors}
             setPendingSensors={setPendingSensors}
-            handleSensorScan={handleSensorScan}scanResult={scanResult}handleDeletSensors={handleDeletSensors}
+            handleSensorScan={handleSensorScan}
+            scanResult={scanResult}
+            handleDeletSensors={handleDeletSensors}
           />
         ) : (
           <LeftImage />

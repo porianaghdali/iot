@@ -24,7 +24,7 @@ export async function getSensorList({ token, node }) {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`, // اضافه شد
-                "Content-Type": "application/x-www-form-urlencoded",  
+        "Content-Type": "application/x-www-form-urlencoded",
       },
       body: formBody,
     });

@@ -1,9 +1,9 @@
 import { RefreshCw, EllipsisVertical } from "lucide-react";
-import DoughnutChart from "@/components/charts/doughnut";
 import Image from "next/image";
 import { useNodes } from "@/hooks/useNodes";
 import { useEffect, useMemo } from "react";
 import { getTokenFromCookie } from "@/utils/functions/auth";
+import GaugeChart from "../../../../components/charts/gaugeChart";
 
 const STATUS_CARDS = [
   {
@@ -51,84 +51,67 @@ const STATUS_CARDS = [
 ];
 
 export default function Card({ item }) {
-  const token = useMemo(() => getTokenFromCookie("token"), []);
-
-  const { nodes, loading, error, fetchNodes } = useNodes(token);
-
   // گرفتن نودهای این zone
-  useEffect(() => {
-    if (item?.ID) {
-      fetchNodes(item.ID);
-    }
-  }, [item?.ID]);
-  if (loading) return <div className="">در حال بارگذاری...</div>;
+console.log(item.sensor)
   return (
     <>
-      {nodes.length ? (
-        <div className="bg-background-box py-3 px-4 w-full rounded-xs">
-          {/* Header */}
-          <div className="flex justify-between items-center text-text-secondary">
-            <p className="text-sm font-normal">{item.zoneName}</p>
+      <div className="bg-background-box py-3 px-4 w-full rounded-xs">
+        {/* Header */}
+        <div className="flex justify-between items-center text-text-secondary">
+          <p className="text-sm font-normal">{item.zoneName}</p>
 
-            <div className="flex items-center gap-2">
-              <button onClick={() => fetchNodes(item.ID)}>
-                <RefreshCw />
-              </button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => fetchNodes(item.ID)}>
+              <RefreshCw />
+            </button>
 
-              <button className="text-text-title">
-                <EllipsisVertical />
-              </button>
-            </div>
+            <button className="text-text-title">
+              <EllipsisVertical />
+            </button>
           </div>
-
-          {/* Charts */}
-
-          <div className="grid grid-cols-5 gap-2 mb-4">
-            <DoughnutChart />
-            <DoughnutChart />
-            <DoughnutChart />
-            <DoughnutChart />
-          </div>
-
-          {/* Status cards */}
-          {nodes.length ? (
-            <div className="flex gap-1.5">
-              {STATUS_CARDS.map((card) => (
-                <div
-                  key={card.id}
-                  className="rounded-t-xs rounded-b-full grid p-[3px] gap-0.5 border border-[#0000001A]"
-                >
-                  <p className="py-0.5 text-center bg-background-box border border-[#0000000D] text-text-secondary text-[10px]">
-                    {card.title}
-                  </p>
-
-                  <p className="py-3 text-center bg-background-box border border-[#0000000D] text-text-secondary text-[10px]">
-                    {card.value}
-                  </p>
-
-                  <div className="bg-[#0000000D] p-[3px] rounded-full">
-                    <div
-                      className="p-4 w-14 h-14 flex items-center justify-center rounded-full shadow-[0px_0px_2px_1px_#00000061]"
-                      style={{ backgroundColor: card.color }}
-                    >
-                      <Image
-                        src={card.icon}
-                        width={26}
-                        height={26}
-                        alt={card.title}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            ""
-          )}
         </div>
-      ) : (
-        "نود موجود نیست"
-      )}
+        {/* Charts */}
+        <div className="grid grid-cols-4 gap-10 mb-4 ">
+        {item.sensor.map((sens) => {
+          return (
+            <div key={sens.ID} className=" ">
+              <GaugeChart data={sens} />
+            </div>
+          );
+        })}</div>
+
+        {/* Status cards */}
+        <div className="flex gap-1.5">
+          {STATUS_CARDS.map((card) => (
+            <div
+              key={card.id}
+              className="rounded-t-xs rounded-b-full grid p-[3px] gap-0.5 border border-[#0000001A]"
+            >
+              <p className="py-0.5 text-center bg-background-box border border-[#0000000D] text-text-secondary text-[10px]">
+                {card.title}
+              </p>
+
+              <p className="py-3 text-center bg-background-box border border-[#0000000D] text-text-secondary text-[10px]">
+                {card.value}
+              </p>
+
+              <div className="bg-[#0000000D] p-[3px] rounded-full">
+                <div
+                  className="p-4 w-14 h-14 flex items-center justify-center rounded-full shadow-[0px_0px_2px_1px_#00000061]"
+                  style={{ backgroundColor: card.color }}
+                >
+                  <Image
+                    src={card.icon}
+                    width={26}
+                    height={26}
+                    alt={card.title}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </>
   );
 }

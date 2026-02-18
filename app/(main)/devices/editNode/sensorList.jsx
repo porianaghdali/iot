@@ -1,17 +1,18 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
+import { Search, Trash2 } from "lucide-react";
 import Image from "next/image";
 
 export default function SensorList({
   sensorList = [],
   pendingSensors = [],
   setPendingSensors,
+  handleSensorScan,
+  scanResult,
+  handleDeletSensors,
 }) {
   const handleDeletePending = (indexToDelete) => {
-    setPendingSensors((prev) =>
-      prev.filter((_, i) => i !== indexToDelete),
-    );
+    setPendingSensors((prev) => prev.filter((_, i) => i !== indexToDelete));
   };
 
   // Render single item
@@ -42,18 +43,25 @@ export default function SensorList({
         </p>
 
         {/* Status */}
+        {/* Status */}
         <p
           className={`text-text-title text-xs font-normal py-1 px-2 rounded w-fit ${
-            isPending
-              ? "bg-[#20E0801A]"
-              : "bg-[#20E0801A]"
+            isPending === "pending"
+              ? "bg-[#20E0801A]" // سنسورهای دستی
+              : isPending === "scanned"
+                ? "bg-[#FFD70033]" // سنسورهای اسکن
+                : "bg-[#20E0801A]" // سنسورهای سرور
           }`}
         >
-          {isPending ? "ثبت نشده" : "ثبت شد"}
+          {isPending === "pending"
+            ? "ثبت نشده"
+            : isPending === "scanned"
+              ? "اسکن شده"
+              : "ثبت شد"}
         </p>
 
         {/* Delete only for pending */}
-        {isPending && (
+        {isPending === "pending" && (
           <button onClick={() => handleDeletePending(index)}>
             <Trash2 size={18} color="#606060" strokeWidth={1.25} />
           </button>
@@ -61,7 +69,7 @@ export default function SensorList({
       </div>
     </div>
   );
-
+  console.log(sensorList, pendingSensors, scanResult, "test sens");
   return (
     <div className="w-2/5 p-1 flex flex-col gap-2 border-r border-[#E0E0E2]">
       {/* Header */}
@@ -72,20 +80,34 @@ export default function SensorList({
           width={36}
           height={36}
         />
-        <p className="text-text-title text-lg font-normal">
-          سنسورهای ثبت شده
-        </p>
+        <p className="text-text-title text-lg font-normal">سنسورهای ثبت شده</p>
       </div>
 
       {/* Pending Sensors (local) */}
-      {pendingSensors.map((item, index) =>
-        renderSensorItem(item, index, true),
+      {/* Pending Sensors (local, manually added) */}
+      {pendingSensors.map(
+        (item, index) => renderSensorItem(item, index, "pending"), // or true
       )}
 
-      {/* Saved Sensors (server) */}
-      {sensorList.map((item, index) =>
-        renderSensorItem(item, index, false),
+      {/* Scan Results (from MQTT scan) */}
+      {scanResult?.map(
+        (item, index) => renderSensorItem(item, index, "scanned"), // وضعیت متفاوت
       )}
+
+      {/* Saved Sensors (from server) */}
+      {sensorList.map((item, index) => renderSensorItem(item, index, false))}
+
+      
+        <div className="py-3 px-4">
+          <button
+            onClick={handleSensorScan}
+            className="bg-[#599DE833] rounded text-sx font-normal text-text-tertiary w-full p-4 flex gap-1.5 items-center justify-center"
+          >
+            <Search />
+            <p> جستجوی خودکار سنسور</p>
+          </button>
+        </div>
+      
     </div>
   );
 }

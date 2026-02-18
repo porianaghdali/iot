@@ -6,8 +6,15 @@ import Image from "next/image";
 import CustomSelect from "../../../../components/ui/customSelect";
 import { X } from "lucide-react";
 
-export default function AddZoneModal({ open, closeCreateModal }) {
+export default function AddZoneModal({
+  open,
+  closeCreateModal,
+  handleChange,
+  formData,
+  onSubmit,
+}) {
   if (!open) return null;
+  console.log(formData);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
@@ -16,8 +23,11 @@ export default function AddZoneModal({ open, closeCreateModal }) {
       />
 
       <div className="relative flex flex-col gap-3 p-1.5  w-full max-w-[570px] bg-background-box shadow-[0px_0px_12px_2px_#00000014]  rounded text-center">
-        <button onClick={closeCreateModal} className=" absolute top-3 left-3 border rounded-full p-1">
-          <X size={18}/>
+        <button
+          onClick={closeCreateModal}
+          className=" absolute top-3 left-3 border rounded-full p-1"
+        >
+          <X size={18} />
         </button>
         <div className="px-3 py-4 flex items-center gap-2 text-text-title text-base font-normal bg-background-modal-header rounded">
           <Image
@@ -39,11 +49,11 @@ export default function AddZoneModal({ open, closeCreateModal }) {
 
             <div className="w-[322px]">
               <CustomInput
-                id="currentPassword"
+                id="zoneName"
                 placeholder="نام ناحیه مورد نظر را وارد کنید"
-                name="currentPassword"
-                // value={formData.ip}
-                // onChange={(e) => handleChange(["ip"], e.target.value)}
+                name="zoneName"
+                value={formData.zoneName}
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -65,10 +75,12 @@ export default function AddZoneModal({ open, closeCreateModal }) {
             </div>
           </div>
 
-          <div className="flex justify-end px-3 py-5 gap-1">
-           
-            <button className="text-center rounded border  py-2 w-24 text-sm font-normal text-text-title border-green bg-[#20E0800D]">
-              ثبت{" "}
+          <div className="flex justify-start px-3 py-5 gap-1">
+            <button
+              onClick={onSubmit}
+              className="text-center rounded border py-2 w-24 text-sm font-normal text-text-title border-green bg-[#20E0800D]"
+            >
+              ثبت
             </button>
           </div>
         </div>

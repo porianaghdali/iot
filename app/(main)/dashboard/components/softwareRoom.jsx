@@ -1,5 +1,4 @@
 import { EllipsisVertical } from "lucide-react";
-import DonutHalf from "@/components/charts/doughnut";
 export default function SoftwareRoom() {
   return (
     <div className="bg-background-box rounded-xs px-3 py-3.5 flex flex-col gap-4 w-72 h-fit">
@@ -17,7 +16,6 @@ export default function SoftwareRoom() {
         <p className="text-text-title text-sm font-normal">نود دما</p>
       </div>
 
- <DonutHalf/>
     </div>
   );
 }

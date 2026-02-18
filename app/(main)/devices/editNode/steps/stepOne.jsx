@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CustomInput from "../../../../../components/ui/customInput";
 import CustomSelect from "../../../../../components/ui/customSelect";
 import useMqtt from "@/hooks/useMqtt";
@@ -7,82 +7,108 @@ import { useZones } from "@/hooks/useZones";
 import { getTokenFromCookie } from "@/utils/functions/auth";
 
 export default function StepOne({ formData, handleChange }) {
-  const token = useMemo(() => getTokenFromCookie("token"), []);
+  const token =
+    typeof window !== "undefined" ? getTokenFromCookie("token") : "";
 
   /* ---------------- ZONES ---------------- */
-
   const { zones, getZonesList } = useZones(token);
+  useEffect(() => {
+    getZonesList();
+  }, []);
 
-  // useEffect(() => {
-  //   getZonesList();
-  // }, []);
+  const zoneOptions = zones.map((z) => ({ label: z.zoneName, value: z.ID }));
 
-  const zoneOptions = zones.map((z) => ({
-    label: z.zoneName,
-    value: z.zoneName,
-  }));
   /* ---------------- MQTT ---------------- */
   const { publish, subscribe, onMessage, offMessage, connected } = useMqtt();
+
   const [pingStatus, setPingStatus] = useState("idle");
   const [latency, setLatency] = useState(null);
-  const macStatusRef = useRef("idle");
-  /* ---------------- HELPERS ---------------- */
-  const setMacStatusSafe = (status) => {
-    macStatusRef.current = status;
-  };
+
   const pingStatusRef = useRef("idle");
+  const macStatusRef = useRef("idle");
+  const pingTimeoutRef = useRef(null);
+  const macTimeoutRef = useRef(null);
+
   const setPingStatusSafe = (status) => {
     pingStatusRef.current = status;
     setPingStatus(status);
   };
 
-  // subscribe به topic جواب ping
+  const setMacStatusSafe = (status) => {
+    macStatusRef.current = status;
+  };
+
+  /* ---------------- Ping Subscribe ---------------- */
   useEffect(() => {
     if (!connected) return;
 
-    const pingTopic = `data/${formData.department || "+"}/${formData.zone || "+"}/node/${formData.sensor || "+"}/Network/ping/+`;
+    const dep = formData.department || "+";
+    const zone = formData.zone || "+";
+    const sensor = formData.sensor || "+";
+
+    const pingTopic = `data/${dep}/${zone}/node/${sensor}/Network/ping/+`;
     subscribe(pingTopic);
 
-    const handleMessage = (msg) => {
-      if (msg.destinationName.includes("/ping")) {
-        const result = msg.payloadString;
-        if (result.includes("ms")) {
-          setPingStatusSafe("success");
-          setLatency(result);
-        } else {
-          // setPingStatusSafe("fail");
-          setLatency(null);
-        }
+    const handlePingMessage = (msg) => {
+      if (!msg.destinationName.includes("/ping")) return;
+      const result = msg.payloadString;
+      if (result.includes("ms")) {
+        setPingStatusSafe("success");
+        setLatency(result);
+      } else {
+        setLatency(null);
       }
     };
 
-    onMessage(handleMessage);
+    onMessage(handlePingMessage);
 
     return () => {
-      offMessage(handleMessage);
+      offMessage(handlePingMessage);
     };
-  }, [connected]);
+  }, [
+    connected,
+    formData.department,
+    formData.zone,
+    formData.sensor,
+    subscribe,
+    onMessage,
+    offMessage,
+  ]);
 
+  /* ---------------- Handlers ---------------- */
   const handlePing = () => {
     if (!formData.ip) return;
 
     setPingStatusSafe("loading");
 
-    const pingPullTopic = `data/{department}/{zone}/node/{sensor}/Network/ping/pull`;
-    // data/{department}/{zone}/"node"/{sensor}/Network/ping/pull
-    const payload = JSON.stringify({
-      ip: formData.ip,
-      count: 1,
-      wait: 1000,
-    });
+    const dep = formData.department || "default";
+    const zone = formData.zone || "default";
+    const sensor = formData.sensor || "default";
 
-    publish(pingPullTopic, payload);
+    const pingTopicSub = `data/${dep}/${zone}/node/${sensor}/Network/ping/+`;
+    const pingTopicPub = `data/${dep}/${zone}/node/${sensor}/Network/ping/pull`;
 
-    // timeout برای جلوگیری از stuck شدن
-    setTimeout(() => {
-      if (pingStatusRef.current === "loading") {
-        setPingStatusSafe("fail");
+    const handlePingMessage = (msg) => {
+      if (!msg.destinationName.includes("/ping")) return;
+      const result = msg.payloadString;
+      if (result.includes("ms")) {
+        setPingStatusSafe("success");
+        setLatency(result);
+        offMessage(handlePingMessage);
+        clearTimeout(pingTimeoutRef.current);
       }
+    };
+
+    onMessage(handlePingMessage);
+    subscribe(pingTopicSub);
+    publish(
+      pingTopicPub,
+      JSON.stringify({ ip: formData.ip, count: 1, wait: 1000 }),
+    );
+
+    pingTimeoutRef.current = setTimeout(() => {
+      if (pingStatusRef.current === "loading") setPingStatusSafe("fail");
+      offMessage(handlePingMessage);
     }, 5000);
   };
 
@@ -121,6 +147,7 @@ export default function StepOne({ formData, handleChange }) {
       offMessage(handleMessage); // cleanup بعد از timeout
     }, 5000);
   };
+
   return (
     <div className="space-y-4">
       {/* Device Name */}
@@ -150,17 +177,17 @@ export default function StepOne({ formData, handleChange }) {
           onChange={(e) => handleChange(["ip"], e.target.value)}
         />
       </div>
-      <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2] ">
-        <label className="text-text-title text-sm font-normal"> MAC</label>
+
+      {/* MAC */}
+      <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2]">
+        <label className="text-text-title text-sm font-normal">MAC</label>
         <div className="flex gap-1 w-full max-w-[372px]">
           <CustomInput
             id="mac"
             name="mac"
             placeholder="آدرس MAC خود را وارد کنید"
             value={formData.mac}
-            onChange={(e) => {
-              handleChange(["mac"], e.target.value);
-            }}
+            onChange={(e) => handleChange(["mac"], e.target.value)}
           />
           <button
             onClick={handleMacPull}
@@ -195,7 +222,7 @@ export default function StepOne({ formData, handleChange }) {
         </div>
       </div>
 
-      {/* نمایش نتیجه */}
+      {/* نمایش نتیجه Ping */}
       {pingStatus !== "idle" && (
         <div className="text-sm mt-2">
           {pingStatus === "loading" && "⏳ در حال بررسی اتصال..."}

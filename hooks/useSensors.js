@@ -51,23 +51,25 @@ export function useSensors(token) {
   );
 
   // ایجاد سنسورهای جدید
-  const createSensors = useCallback(
-    async (sensors, nodeId) => {
-      try {
-        for (const s of sensors) {
-          await setSensor({
+ const createSensors = useCallback(
+  async (sensors, nodeId) => {
+    try {
+      await Promise.all(
+        sensors.map((s) =>
+          setSensor({
             formData: { ...s, node: nodeId },
             token,
-          });
-        }
-        // بعد از ایجاد، لیست رو رفرش کن
-        await getList(nodeId);
-      } catch (err) {
-        console.error("Failed to create sensors:", err);
-      }
-    },
-    [token, getList]
-  );
+          })
+        )
+      );
+      await getList(nodeId); // refresh لیست
+    } catch (err) {
+      console.error("Failed to create sensors:", err);
+    }
+  },
+  [token, getList]
+);
+
 
   return {
     sensorList,

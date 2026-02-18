@@ -1,0 +1,29 @@
+name: SSH Deployment Backend
+
+on:
+  push:
+    branches:
+      - main
+    # فقط وقتی پیام کامیت شامل #deploy باشد
+    # توجه: uses commit message filtering via if expression in job
+env:
+  SSHKEY: ${{ secrets.SSHKEY }}
+
+jobs:
+  ssh-test:
+    if: contains(github.event.head_commit.message, '#deploy')
+    runs-on: software
+
+    steps:
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSHKEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo -e "Host *\n  StrictHostKeyChecking no" >> ~/.ssh/config
+
+      - name: Deploy to Windows server
+        run: |
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no alikhalili@192.168.30.20 \
+          "cd C:\\xampp\\htdocs\\frontend && git reset --hard && git clean -fd && git pull && npm i && npm run build && net stop \"Sepehr EMS 3\" && net start \"Sepehr EMS 3\""
+

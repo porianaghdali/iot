@@ -1,5 +1,4 @@
 import { EllipsisVertical } from "lucide-react";
-import DonutHalf from "@/components/charts/doughnut";
 const list = [
   {
     id: 1,
@@ -48,12 +47,10 @@ export default function Store() {
       <div className="grid grid-cols-2 gap-2">
         <div className=" text-center text-text-secondary font-normal text-xs">
            
-          <DonutHalf />
           <p>دما</p>
         </div>
         <div className=" text-center text-text-secondary font-normal text-xs">
            
-          <DonutHalf />
           <p>فضا</p>
         </div>
       </div>

@@ -1,6 +1,9 @@
+import { X } from "lucide-react";
+
 export default function Header({ step }) {
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col relative">
+      
       <div className="flex gap-2 items-center mb-2">
         <div className="bg-[#65139B] rounded-md text-white text-xl w-7 text-center">
           {step}

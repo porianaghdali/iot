@@ -16,7 +16,7 @@ export default function Header({ toggleSidebar }) {
         <button onClick={toggleSidebar}>
           <Menu />
         </button>
- 
+
         <div className="flex items-center gap-3">
           <Image src="/images/logo.png" width={26} height={26} alt="logo" />
           <p className="text-text-title font-normal text-lg">پایش محیط سپهر</p>
@@ -26,7 +26,7 @@ export default function Header({ toggleSidebar }) {
       <div className="flex items-center gap-6 text-text-title relative">
         {/* <LanguageSwitcher/> */}
         <ThemeToggle />
-       
+
         <button onClick={() => setOpenNotifications(!openNotifications)}>
           <Bell strokeWidth={1.25} />
         </button>

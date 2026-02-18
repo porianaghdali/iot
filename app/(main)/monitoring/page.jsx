@@ -2,37 +2,20 @@
 import Card from "./components/card";
 import Alert from "./components/alerts";
 import MonitoringHeader from "./monitoringHeader";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getTokenFromCookie } from "@/utils/functions/auth.js";
+import { useMonitoring } from "@/hooks/useMonitoring";
 
 import { getZone } from "../../api/fetchZone";
 export default function Monitoring() {
-  const [zoneList, setZoneList] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const token = useMemo(() => getTokenFromCookie("token"), []);
 
-  const handleGetZone = async () => {
-    setLoading(true);
-    setError("");
-    const token = getTokenFromCookie("token");
-
-    try {
-      const response = await getZone({ token });
-
-      if (response?.errorCode === 0) {
-        setZoneList(response.data);
-      } else {
-        setError(response?.message || "خطایی رخ داده است");
-      }
-    } catch (err) {
-      setError("ارتباط با سرور برقرار نشد");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { zoneList, getList, loading, error } = useMonitoring(token);
   useEffect(() => {
-    handleGetZone();
-  }, []);
+    if (token) getList();
+  }, [token]);
+
+  if (loading) return <div>loading...</div>;
   return (
     <div className="w-full bg-background-main h-[calc(100vh-64px)] overflow-auto ">
       <MonitoringHeader />
@@ -42,7 +25,7 @@ export default function Monitoring() {
           {zoneList.map((item) => {
             return (
               <div key={item.ID} className="">
-                <Card item={item}/>
+                <Card item={item} />
               </div>
             );
           })}
