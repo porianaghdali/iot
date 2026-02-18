@@ -14,7 +14,6 @@ export default function AddZoneModal({
   onSubmit,
 }) {
   if (!open) return null;
-  console.log(formData);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div

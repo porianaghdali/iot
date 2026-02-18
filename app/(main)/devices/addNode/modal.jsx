@@ -48,7 +48,6 @@ export default function AddDeviceModal({
 
   // Sensors waiting to be saved
   const [pendingSensors, setPendingSensors] = useState([]);
-  console.log(pendingSensors,"pendingSensors")
   const [scanResult, setScanResult] = useState(null);
   const [scanStatus, setScanStatus] = useState("idle");
 

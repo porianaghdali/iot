@@ -52,7 +52,6 @@ const STATUS_CARDS = [
 
 export default function Card({ item }) {
   // گرفتن نودهای این zone
-console.log(item.sensor)
   return (
     <>
       <div className="bg-background-box py-3 px-4 w-full rounded-xs">

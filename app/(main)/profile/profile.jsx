@@ -19,7 +19,6 @@ export default function Profile({ openProfile, setOpenProfile }) {
     { id: 6, title: "خروج", icon: <User /> },
   ];
   const handleLogout = () => {
-    console.log("first")
     // پاک کردن توکن‌ها از کوکی
     document.cookie = "token=; path=/; max-age=0";
     document.cookie = "auth=; path=/; max-age=0";

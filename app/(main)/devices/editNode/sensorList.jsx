@@ -69,7 +69,6 @@ export default function SensorList({
       </div>
     </div>
   );
-  console.log(sensorList, pendingSensors, scanResult, "test sens");
   return (
     <div className="w-2/5 p-1 flex flex-col gap-2 border-r border-[#E0E0E2]">
       {/* Header */}
