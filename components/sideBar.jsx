@@ -224,7 +224,7 @@ export default function SideBar({ isOpen }) {
               height={24}
             />
             <p className="font-normal truncate whitespace-nowrap text-base">
-              راهنما
+              راهنما و پشتیبانی
             </p>
           </Link>
         </div>
