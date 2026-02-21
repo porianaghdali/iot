@@ -1,14 +1,24 @@
+"use client";
 import { Trash } from "lucide-react";
+import { useState } from "react";
 import CustomInput from "../../../../../components/ui/customInput";
-import CustomSelect from "../../../../../components/ui/customSelect";
 
 export default function StepThree({ formData, handleChange }) {
-  const ip = [
-    { title: "168.12.1.1", id: 1 },
-    { title: "168.12.1.1", id: 2 },
-    { title: "168.12.1.1", id: 3 },
-    { title: "168.12.1.1", id: 4 },
-  ];
+  const [inputIp, setInputIp] = useState("");
+
+  const ipList = formData.acceptIp || [];
+
+  const addIp = () => {
+    if (!inputIp.trim()) return;
+
+    handleChange("acceptIp", [...ipList, inputIp.trim()]);
+    setInputIp("");
+  };
+
+  const removeIp = (index) => {
+    const newList = ipList.filter((_, i) => i !== index);
+    handleChange("acceptIp", newList);
+  };
   return (
     <div className="border border-border-muted h-full bg=">
       <div className="bg-background-modal-header text-center font-normal p-4 text-sm text-text-tertiary">
@@ -21,10 +31,10 @@ export default function StepThree({ formData, handleChange }) {
             placeholder="IP را وارد کنید"
             id="acceptIp"
             name="acceptIp"
-            value={formData.IP}
-            onChange={(e) => handleChange(["acceptIp "], e.target.value)}
+            value={inputIp}
+            onChange={(e) => setInputIp(e.target.value)}
           />{" "}
-          <button
+          <button             onClick={addIp}
             className="border 
               py-2.5 rounded w-24 text-text-title font-normal text-sm
                bg-[#20E0800D] border-green"
@@ -32,17 +42,18 @@ export default function StepThree({ formData, handleChange }) {
             ثبت
           </button>
         </div>
+        <div className=""></div>
       </div>
       <div className="grid gap-1 px-[6%] py-[4%]">
-        {ip.map((item) => {
+        {ipList.map((ip,index) => {
           return (
-            <div key={item.id} className="flex gap-1">
+            <div key={index} className="flex gap-1">
               <div className="bg-background-modal-header text-text-tertiary text-sm font-normal w-15 flex justify-center items-center rounded">
-                {item.id}
+                {index + 1}
               </div>
               <div className="bg-background-modal-header text-text-tertiary text-sm font-normal p-3 rounded w-full flex justify-between">
-                <p>{item.title}</p>
-                <button className="p-1 rounded-xl border border-[text-tertiary]">
+                <p>{ip}</p>
+                <button onClick={() => removeIp(index)} className="p-1 rounded-xl border border-[text-tertiary]">
                   <Trash size={18} strokeWidth={1.25} />
                 </button>
               </div>

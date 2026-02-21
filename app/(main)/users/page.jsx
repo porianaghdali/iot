@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import AddUserModal from "./addNode/modal";
+import AddUserModal from "./addUser/modal";
 import UsersHeader from "./usersHeader";
 import { Edit, ListFilter } from "lucide-react";
 import { getTokenFromCookie } from "@/utils/functions/auth.js";

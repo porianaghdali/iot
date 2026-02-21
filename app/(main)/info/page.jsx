@@ -41,15 +41,19 @@ export default function Info() {
         </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5  gap-5 px-[7%] py-7">
-{list.map((item)=>{
-    return(<div  key={item.key} className="bg-white shadow-[0px_2px_6px_0px_#00000033] rounded grid gap-3.5 py-7 justify-center  ">
-        <Image src={item.src} alt={item.title} width={80} height={80} />
-        <p className="text-text-title text-lg font-normal text-center">{item.title}</p>
-    </div>)
-})}
-
-
-
+        {list.map((item) => {
+          return (
+            <div
+              key={item.key}
+              className="bg-white shadow-[0px_2px_6px_0px_#00000033] rounded grid gap-3.5 py-7 justify-center  "
+            >
+              <Image src={item.src} alt={item.title} width={80} height={80} />
+              <p className="text-text-title text-lg font-normal text-center">
+                {item.title}
+              </p>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

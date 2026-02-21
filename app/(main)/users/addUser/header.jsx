@@ -1,6 +1,6 @@
 import { CircleX } from "lucide-react";
 
-export default function Header({ step,setStep }) {
+export default function Header({ step, setStep }) {
   const list = [
     { title: "مشخصات", id: 1 },
     { title: "دسترسی‌ها", id: 2 },
@@ -30,7 +30,14 @@ export default function Header({ step,setStep }) {
                 }
                      rounded text-[#60606080] text-sm font-normal`}
               >
-                <button onClick={()=>{setStep(item.id)}} className=" w-full h-full p-1.5 rounded">{item.title}</button>
+                <button
+                  onClick={() => {
+                    setStep(item.id);
+                  }}
+                  className=" w-full h-full p-1.5 rounded"
+                >
+                  {item.title}
+                </button>
               </div>
             );
           })}

@@ -6,17 +6,23 @@ import Footer from "./footer";
 import Header from "./header";
 import { useState } from "react";
 import StepFour from "./steps/stepFour";
-
+const initialFormData = {
+  ID: null,
+  username: "",
+  password: "",
+  name: "",
+  mobile: "",
+  email: "",
+  description: "",
+  role: "",
+  access: {},
+  zonesAccess: {},
+  state: "",
+  acceptIp: "",
+};
 export default function AddUserModal({ open, handleClose, step, setStep }) {
-  const [formData, setFormData] = useState({
-    name: "",
-    username: "",
-    password: "",
-    email: "",
-    mobile: "",
-    role: "",
-  });
-
+  const [formData, setFormData] = useState(initialFormData);
+console.log(formData,"test")
   const handleChange = (key, value) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
@@ -24,7 +30,7 @@ export default function AddUserModal({ open, handleClose, step, setStep }) {
 
   const steps = {
     1: <StepOne handleChange={handleChange} formData={formData} />,
-    2: <StepTwo handleChange={handleChange} />,
+    2: <StepTwo handleChange={handleChange} formData={formData}/>,
     3: <StepThree handleChange={handleChange} formData={formData} />,
     4: <StepFour handleChange={handleChange} formData={formData} />,
   };
@@ -39,7 +45,7 @@ export default function AddUserModal({ open, handleClose, step, setStep }) {
           {/* Header */}
           <Header step={step}setStep={setStep} />
           {/* Body */}
-          <div className="space-y-2 text-xs  h-[78%] ">{steps[step]}</div>
+          <div className="space-y-2 text-xs  h-[78%] ">{steps[step] || steps[1]}</div>
 
           {/* Footer */}
           <Footer step={step} setStep={setStep} onClose={handleClose} />
