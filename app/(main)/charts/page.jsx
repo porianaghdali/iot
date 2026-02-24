@@ -47,7 +47,7 @@ export default function Charts() {
             </button>
             <Filter />
           </div>
-          <div className="w-4/5 mx-auto max-h-[372px] ">
+          <div className="w-4/5 mx-auto  ">
             <IrregularTimeChart />
           </div>
         </div>

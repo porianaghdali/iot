@@ -34,7 +34,8 @@ export default function StepThree({ formData, handleChange }) {
             value={inputIp}
             onChange={(e) => setInputIp(e.target.value)}
           />{" "}
-          <button             onClick={addIp}
+          <button
+            onClick={addIp}
             className="border 
               py-2.5 rounded w-24 text-text-title font-normal text-sm
                bg-[#20E0800D] border-green"
@@ -45,7 +46,7 @@ export default function StepThree({ formData, handleChange }) {
         <div className=""></div>
       </div>
       <div className="grid gap-1 px-[6%] py-[4%]">
-        {ipList.map((ip,index) => {
+        {ipList.map((ip, index) => {
           return (
             <div key={index} className="flex gap-1">
               <div className="bg-background-modal-header text-text-tertiary text-sm font-normal w-15 flex justify-center items-center rounded">
@@ -53,7 +54,10 @@ export default function StepThree({ formData, handleChange }) {
               </div>
               <div className="bg-background-modal-header text-text-tertiary text-sm font-normal p-3 rounded w-full flex justify-between">
                 <p>{ip}</p>
-                <button onClick={() => removeIp(index)} className="p-1 rounded-xl border border-[text-tertiary]">
+                <button
+                  onClick={() => removeIp(index)}
+                  className="p-1 rounded-xl border border-[text-tertiary]"
+                >
                   <Trash size={18} strokeWidth={1.25} />
                 </button>
               </div>

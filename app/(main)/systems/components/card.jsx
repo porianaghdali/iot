@@ -1,5 +1,6 @@
 import { EllipsisVertical } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Card({status}) {
   const list = [
@@ -29,9 +30,10 @@ export default function Card({status}) {
     },
   ];
   return (
-    <div className="bg-background-box p-2 w-full rounded-xs  border border-border-muted">
-      <div className="flex justify-between items-center mb-3.5">
-        <div className="flex gap-2 items-center">
+    
+    <div className="bg-background-box p-1.5 w-full rounded-xs  border border-[#0D0D0D1A]">
+      <div className="flex justify-between items-start mb-3.5">
+        <div className="grid gap-2 items-center">
           <p className="text-text-title text-sx font-normal">اتاق نرم افزار</p>
           <p
             className={`text-text-title text-[10px] font-normal rounded-[50px] w-fit
@@ -54,9 +56,7 @@ export default function Card({status}) {
         })}
       </div>
       <div className="flex justify-end mt-8">
-        <button className="text-xs font-normal text-text-title bg-background-button  rounded-[50px] py-1 px-5">
-          دیدن ناحیه
-        </button>
+     
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { getSensorList, getSensorType, setSensor, DeleteSensor } from "../app/api/fetchSensor";
+import { getSensorList, getSensorType, setSensor, DeleteSensor,setMultipleSensors } from "../app/api/fetchSensor";
 
 export function useSensors(token) {
   const [sensorList, setSensorList] = useState([]);
@@ -69,6 +69,24 @@ export function useSensors(token) {
   },
   [token, getList]
 );
+ const createMultipleSensor = useCallback(
+  async (node, sensors) => {
+    try {
+      await setMultipleSensors({
+        formData: {
+          node: node,
+          sensors: JSON.stringify(sensors), // ⭐ مهم
+        },
+        token,
+      });
+
+      await getList(node); // refresh لیست
+    } catch (err) {
+      console.error("Failed to create sensors:", err);
+    }
+  },
+  [token, getList]
+);
 
 
   return {
@@ -77,6 +95,6 @@ export function useSensors(token) {
     getTypes,
     getList,
     createSensors,
-    deleteSensorById,
+    deleteSensorById,createMultipleSensor
   };
 }

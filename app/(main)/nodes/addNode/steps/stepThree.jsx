@@ -12,9 +12,10 @@ export default function StepThree({
   sensorData,
   setSensorData,
   handleAddSensors,
+  isEditing, // ⭐ اضافه
 }) {
   const token = useMemo(() => getTokenFromCookie("token"), []);
-  const { getTypes, sensorTypes, } = useSensors(token, formData.ID);
+  const { getTypes, sensorTypes } = useSensors(token, formData.ID);
 
   useEffect(() => {
     getTypes();
@@ -52,8 +53,9 @@ export default function StepThree({
     subscribe(snmpTopic);
 
     const handleMessage = (msg) => {
-      if (msg.destinationName.includes("/SNMP")) {
-        const result = msg.payloadString;
+      // فقط پیام‌های SNMP/get
+      if (msg.destinationName.includes("/SNMP/get")) {
+        const result = msg.payloadString.trim(); // مقدار واقعی get
         if (result) {
           setSnmpStatusSafe("success");
           setSnmpResult(result);
@@ -113,6 +115,18 @@ export default function StepThree({
           onChange={handleChange}
         />
       </div>
+        <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2]">
+        <label className="text-text-title text-sm font-normal">
+          نوع سنسور{" "}
+        </label>
+
+        <CustomSelect
+          options={sensorOptions}
+          value={sensorData.type}
+          onChange={handleSensorTypeChange}
+          placeholder="نوع سنسور را انتخاب کنید"
+        />
+      </div>
       {formData.protocol == "SNMP" && (
         <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2]">
           <label className="text-text-title text-sm font-normal ">OID </label>
@@ -127,18 +141,7 @@ export default function StepThree({
         </div>
       )}
 
-      <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2]">
-        <label className="text-text-title text-sm font-normal">
-          نوع سنسور{" "}
-        </label>
-
-        <CustomSelect
-          options={sensorOptions}
-          value={sensorData.type}
-          onChange={handleSensorTypeChange}
-          placeholder="نوع سنسور را انتخاب کنید"
-        />
-      </div>
+    
       {formData.protocol == "Modbus" && (
         <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2]">
           <label className="text-text-title text-sm font-normal">
@@ -248,10 +251,10 @@ export default function StepThree({
       </div>
       <div className="flex items-center justify-between px-3 py-3.5 ">
         <button
-          onClick={handleAddSensors}
+          onClick={handleAddSensors}  
           className="border border-border-muted w-full p-2.5 rounded bg-[#C1C1C133]"
         >
-          ثبت سنسور{" "}
+          {isEditing ? "ویرایش سنسور" : "ثبت سنسور"}
         </button>
       </div>
       {snmpStatus !== "idle" && (

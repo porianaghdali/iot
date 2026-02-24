@@ -2,7 +2,7 @@
 import Card from "./components/card";
 import Alert from "./components/alerts";
 import MonitoringHeader from "./monitoringHeader";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getTokenFromCookie } from "@/utils/functions/auth.js";
 import { useMonitoring } from "@/hooks/useMonitoring";
 
@@ -11,10 +11,14 @@ export default function Monitoring() {
   const token = useMemo(() => getTokenFromCookie("token"), []);
 
   const { zoneList, getList, loading, error } = useMonitoring(token);
+
   useEffect(() => {
     if (token) getList();
   }, [token]);
 
+  console.log(zoneList);
+
+  
   if (loading) return <div>loading...</div>;
   return (
     <div className="w-full bg-background-main h-[calc(100vh-64px)] overflow-auto ">

@@ -22,7 +22,6 @@ const initialFormData = {
 };
 export default function AddUserModal({ open, handleClose, step, setStep }) {
   const [formData, setFormData] = useState(initialFormData);
-console.log(formData,"test")
   const handleChange = (key, value) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };

@@ -26,7 +26,7 @@ const initialSensorData = {
   active: 0,
   mqttValue: "",
 };
-export default function AddDeviceModal({
+export default function EditModal({
   open,
   formData,
   setFormData,
@@ -48,7 +48,7 @@ export default function AddDeviceModal({
 
   // Sensors waiting to be saved
   const [pendingSensors, setPendingSensors] = useState([]);
-  
+
   const [scanResult, setScanResult] = useState(null);
   const [scanStatus, setScanStatus] = useState("idle");
 
@@ -73,8 +73,6 @@ export default function AddDeviceModal({
     subscribe(responseTopic);
 
     const handleMessage = (msg) => {
-
-
       if (msg.destinationName !== responseTopic) return;
 
       const result = msg.payloadString;
@@ -182,7 +180,7 @@ export default function AddDeviceModal({
           <X size={16} />
         </button>{" "}
         <div className="w-full xl:w-3/5 h-full px-[6%] py-[5%] overflow-auto">
-          <Header step={step} />
+          <Header step={step} setStep={setStep} />
           <div className="space-y-2 text-xs">{steps[step]}</div>
           <Footer
             step={step}

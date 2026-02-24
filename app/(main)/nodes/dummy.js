@@ -1,0 +1,43 @@
+export const initialNodeFormData = {
+  ID: "",
+  deviceName: "",
+  active: "",
+  ip: "",
+  mac: "",
+  zone: "",
+  protocol: "",
+  interval: "",
+  config: {
+    version: "",
+    port: "",
+    slaveID: "",
+    authProtocol: "",
+    authUser: "",
+    authPass: "",
+    privProtocol: "",
+    privPass: "",
+    community: "",
+  },
+}
+export const tableHeaders = [
+  { id: 1, title: "ردیف" },
+  { id: 2, title: "نام" },
+  { id: 3, title: "ناحیه" },
+  { id: 4, title: "IP" },
+  { id: 5, title: "نوع" },
+  { id: 6, title: "Community" },
+  { id: 7, title: "آخرین اتصال" },
+  { id: 8, title: "وضعیت" },
+];
+export const initialSensorData = {
+  ID: "",
+  type: "",
+  node: "",
+  sensorName: "",
+  dataType: "",
+  dataAddress: "",
+  oid: "",
+  historySave: 0,
+  active: 0,
+  mqttValue: "",
+};

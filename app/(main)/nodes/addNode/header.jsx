@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
 
-export default function Header({ step }) {
+export default function Header({ step, }) {
   return (
     <div className="flex flex-col relative">
       

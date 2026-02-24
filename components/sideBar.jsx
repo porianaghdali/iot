@@ -67,8 +67,8 @@ const mainMenu = [
     ),
     path: "/monitoring",
   },
-  { id: 3, title: "ناحیه ها", img: "/images/icons/layer2.svg", path: "/areas" },
-  { id: 4, title: "دستگاه ها", img: "/images/icons/iot.svg", path: "/devices" },
+  { id: 3, title: "ناحیه ها", img: "/images/icons/layer2.svg", path: "/zones" },
+  { id: 4, title: "دستگاه ها", img: "/images/icons/iot.svg", path: "/nodes" },
   {
     id: 5,
     title: "سیستم ها",

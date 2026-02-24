@@ -1,9 +1,11 @@
+"use client";
 import { RefreshCw, EllipsisVertical } from "lucide-react";
 import Image from "next/image";
 import { useNodes } from "@/hooks/useNodes";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getTokenFromCookie } from "@/utils/functions/auth";
 import GaugeChart from "../../../../components/charts/gaugeChart";
+import useMqtt from "@/hooks/useMqtt";
 
 const STATUS_CARDS = [
   {
@@ -52,9 +54,47 @@ const STATUS_CARDS = [
 
 export default function Card({ item }) {
   // گرفتن نودهای این zone
+
+  const { subscribe, onMessage, offMessage } = useMqtt();
+  const snmpStatusRef = useRef("idle");
+  const [snmpResults, setSnmpResults] = useState([]); // آرایه برای چند جواب
+  const [snmpStatus, setSnmpStatus] = useState("idle");
+
+  const setSnmpStatusSafe = (status) => {
+    snmpStatusRef.current = status;
+    setSnmpStatus(status);
+  };
+
+  const handleSnmpPull = () => {
+    setSnmpStatusSafe("loading");
+    setSnmpResults([]); // پاک کردن نتایج قبلی قبل از pull
+
+    const snmpTopic = `data/department/${item.ID || "+"}/+/+/+/get`;
+    subscribe(snmpTopic);
+
+    const handleMessage = (msg) => {
+      if (msg.destinationName.includes("/SNMP")) {
+        const result = msg.payloadString || null;
+        setSnmpResults((prev) => [...prev, result]);
+        setSnmpStatusSafe(result ? "success" : "fail");
+      }
+    };
+
+    onMessage(handleMessage);
+
+    setTimeout(() => {
+      if (snmpStatusRef.current === "loading") setSnmpStatusSafe("fail");
+      offMessage(handleMessage); // cleanup بعد از timeout
+    }, 5000);
+  };
+
+  console.log(snmpResults, "snmpResult");
   return (
     <>
       <div className="bg-background-box py-3 px-4 w-full rounded-xs">
+         <button onClick={handleSnmpPull} className="p-4 border mb-2">
+        تست اتصال
+      </button>
         {/* Header */}
         <div className="flex justify-between items-center text-text-secondary">
           <p className="text-sm font-normal">{item.zoneName}</p>
@@ -71,13 +111,14 @@ export default function Card({ item }) {
         </div>
         {/* Charts */}
         <div className="grid grid-cols-4 gap-10 mb-4 ">
-        {item.sensor.map((sens) => {
-          return (
-            <div key={sens.ID} className=" ">
-              <GaugeChart data={sens} />
-            </div>
-          );
-        })}</div>
+          {item.sensor.map((sens) => {
+            return (
+              <div key={sens.ID} className=" ">
+                <GaugeChart data={sens} />
+              </div>
+            );
+          })}
+        </div>
 
         {/* Status cards */}
         <div className="flex gap-1.5">

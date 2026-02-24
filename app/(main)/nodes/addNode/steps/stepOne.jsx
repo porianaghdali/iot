@@ -25,6 +25,7 @@ export default function StepOne({ formData, handleChange }) {
   const [pingStatus, setPingStatus] = useState("idle");
   const [latency, setLatency] = useState(null);
   const macStatusRef = useRef("idle");
+  const randomNodeRef = useRef(null);
   /* ---------------- HELPERS ---------------- */
   const setMacStatusSafe = (status) => {
     macStatusRef.current = status;
@@ -34,22 +35,25 @@ export default function StepOne({ formData, handleChange }) {
     pingStatusRef.current = status;
     setPingStatus(status);
   };
-
+  useEffect(() => {
+    randomNodeRef.current = "node-" + Math.random().toString(36).slice(2, 8);
+  }, []);
   // subscribe به topic جواب ping
   useEffect(() => {
-    if (!connected) return;
+    if (!connected || !randomNodeRef.current) return;
 
-    const pingTopic = `data/${formData.department || "+"}/${formData.zone || "+"}/node/${formData.sensor || "+"}/Network/ping/+`;
+    const pingTopic = `data/${formData.department || "+"}/${formData.zone || "+"}/${randomNodeRef.current}/${formData.sensor || "+"}/Network/ping/+`;
+
     subscribe(pingTopic);
 
     const handleMessage = (msg) => {
       if (msg.destinationName.includes("/ping")) {
         const result = msg.payloadString;
+
         if (result.includes("ms")) {
           setPingStatusSafe("success");
           setLatency(result);
         } else {
-          // setPingStatusSafe("fail");
           setLatency(null);
         }
       }
@@ -60,14 +64,14 @@ export default function StepOne({ formData, handleChange }) {
     return () => {
       offMessage(handleMessage);
     };
-  }, [connected]);
+  }, [connected, formData.department, formData.zone, formData.sensor]);
 
   const handlePing = () => {
     if (!formData.ip) return;
 
     setPingStatusSafe("loading");
 
-    const pingPullTopic = `data/{department}/{zone}/node/{sensor}/Network/ping/pull`;
+    const pingPullTopic = `data/${formData.department || "default"}/${formData.zone || "default"}/${randomNodeRef.current}/${formData.sensor || "default"}/Network/ping/pull`;
     // data/{department}/{zone}/"node"/{sensor}/Network/ping/pull
     const payload = JSON.stringify({
       ip: formData.ip,

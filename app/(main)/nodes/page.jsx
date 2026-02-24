@@ -6,39 +6,8 @@ import EditNodeModal from "./editNode/modal";
 import { getTokenFromCookie } from "@/utils/functions/auth";
 import { useNodes } from "@/hooks/useNodes";
 import { useEffect, useMemo, useState } from "react";
-
-const initialNodeFormData = {
-  ID: "",
-  deviceName: "",
-  active: "",
-  ip: "",
-  mac: "",
-  zone: "",
-  protocol: "",
-  interval: "",
-  config: {
-    version: "",
-    port: "",
-    slaveID: "",
-    authProtocol: "",
-    authUser: "",
-    authPass: "",
-    privProtocol: "",
-    privPass: "",
-    community: "",
-  },
-};
-
-const tableHeaders = [
-  { id: 1, title: "ردیف" },
-  { id: 2, title: "نام" },
-  { id: 3, title: "ناحیه" },
-  { id: 4, title: "IP" },
-  { id: 5, title: "نوع" },
-  { id: 6, title: "Community" },
-  { id: 7, title: "آخرین اتصال" },
-  { id: 8, title: "وضعیت" },
-];
+import { initialNodeFormData, tableHeaders } from "./dummy";
+import Dialog from "@/components/ui/dialog";
 
 export default function Systems() {
   const token = useMemo(() => getTokenFromCookie("token"), []);
@@ -53,7 +22,6 @@ export default function Systems() {
 
   // Form data
   const [nodeFormData, setNodeFormData] = useState(initialNodeFormData);
-
   const { nodes, loading, error, fetchNodes, createNode, deleteNode } =
     useNodes(token);
 
@@ -211,8 +179,10 @@ export default function Systems() {
         open={isEditModalOpen}
         step={editStep}
         setStep={setEditStep}
-        handleClose={closeEditModal}
+        handleClose={closeCreateModal}
+        handleSaveNode={saveNode}
         handleChange={handleChange}
+        setFormData={setNodeFormData}
       />
     </div>
   );

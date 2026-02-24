@@ -83,3 +83,27 @@ export async function DeleteSensor({ token, ID }) {
     throw error;
   }
 }
+export async function setMultipleSensors({ formData, token }) {
+  const url =
+    "https://192.168.30.20/ems3/web/api/user/sensor/set-multiple";
+
+  const fd = new FormData();
+
+  fd.append("node", formData.node);
+  fd.append("sensors", formData.sensors); // باید string باشد
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      body: fd,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return await response.json();
+  } catch (error) {
+    console.error("API ERROR:", error);
+    throw error;
+  }
+}

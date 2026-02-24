@@ -1,7 +1,8 @@
 import { RefreshCw, EllipsisVertical } from "lucide-react";
-import Card from "./card"
+import Card from "./card";
+import Link from "next/link";
 export default function Section() {
-const data=[1,2,3,4]
+  const data = [1, 2, 3, 4];
   return (
     <div className="bg-background-box py-3 px-4 w-full rounded-xs flex flex-col gap-2">
       <div className="flex justify-between items-center text-text-secondary">
@@ -10,19 +11,20 @@ const data=[1,2,3,4]
           <button>
             <RefreshCw />
           </button>
-          <button  className="text-text-title"><EllipsisVertical /></button> 
+          <button className="text-text-title">
+            <EllipsisVertical />
+          </button>
         </div>
       </div>
-   <div className="grid grid-cols-3 gap-2">
-      {data.map((item) => {
-                return (
-                  <div key={item} className="">
-                    <Card />
-                  </div>
-                );
-              })}
-
-   </div>
+      <div className="grid grid-cols-3 gap-2">
+        {data.map((item) => {
+          return (
+            <Link href={`/systems/${item.id}`} key={item}>
+              <Card />
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }
