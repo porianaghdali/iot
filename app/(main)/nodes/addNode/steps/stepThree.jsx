@@ -108,6 +108,7 @@ export default function StepThree({
         </label>
 
         <CustomInput
+        
           id="sensorName"
           name="sensorName"
           placeholder="اسم سنسور را وارد کنید"
