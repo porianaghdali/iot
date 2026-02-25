@@ -23,8 +23,8 @@ export const tableHeaders = [
   { id: 2, title: "نام" },
   { id: 3, title: "ناحیه" },
   { id: 4, title: "IP" },
-  { id: 5, title: "نوع" },
-  { id: 6, title: "Community" },
+  { id: 5, title: " پروتکل" },
+  { id: 6, title: "تعداد سنسور" },
   { id: 7, title: "آخرین اتصال" },
   { id: 8, title: "وضعیت" },
 ];

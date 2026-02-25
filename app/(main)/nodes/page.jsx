@@ -83,7 +83,7 @@ export default function Systems() {
     setIsCreateModalOpen(true); // باز کردن مودال ساخت
   };
   if (loading) return <div>loading...</div>;
-
+console.log(nodes)
   return (
     <div className="w-full bg-background-main h-[calc(100vh-64px)] overflow-auto">
       <DevicesHeader openCreateModal={openCreateModal} />
@@ -137,7 +137,7 @@ export default function Systems() {
                   {node.deviceName}
                 </td>
                 <td className="border-b border-border-main px-4 py-3 text-center text-text-tertiary text-xs font-normal">
-                  {node.zone}
+                  {node.zone.zoneName}
                 </td>
                 <td className="border-b border-border-main px-4 py-3 text-center text-text-tertiary text-xs font-normal">
                   {node.ip}
@@ -146,7 +146,7 @@ export default function Systems() {
                   {node.protocol}
                 </td>
                 <td className="border-b border-border-main px-4 py-3 text-center text-text-tertiary text-xs font-normal">
-                  {node.config?.community || "-"}
+                  {node.config?.sensors || "-"}
                 </td>
                 <td className="border-b border-border-main px-4 py-3 text-center text-text-tertiary text-xs font-normal">
                   {node.lastLogin}

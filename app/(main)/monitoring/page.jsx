@@ -16,13 +16,11 @@ export default function Monitoring() {
     if (token) getList();
   }, [token]);
 
-
-  
   if (loading) return <div>loading...</div>;
   return (
     <div className="w-full bg-background-main h-[calc(100vh-64px)] overflow-auto ">
       <MonitoringHeader />
-
+    
       <div className="w-full grid grid-cols-1 lg:grid-cols-5 gap-1.5 p-4">
         <div className="lg:col-span-4 grid gap-1.5">
           {zoneList.map((item) => {
