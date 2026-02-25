@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Bell, Copy, Delete, Edit, ListFilter } from "lucide-react";
+import { Bell, Copy, Delete, Edit, ListFilter, Trash } from "lucide-react";
 
 import DevicesHeader from "./devicesHeader";
 import AddNodeModal from "./addNode/modal";
@@ -155,18 +155,18 @@ export default function Systems() {
                   {node.active}
                 </td>
                 <td className="border-b border-border-main text-center text-text-tertiary text-xs font-normal">
-                  <div className="flex gap-4 px-4 py-3">
+                  <div className="flex  justify-between px-4 py-3 ">
                     <button>
-                      <Bell size={16} className="mx-auto cursor-pointer" />
+                      <Bell size={18} className="mx-auto cursor-pointer" />
                     </button>
                     <button onClick={() => openEditModal(node)}>
-                      <Edit size={16} className="mx-auto cursor-pointer" />
+                      <Edit size={18} className="mx-auto cursor-pointer" />
                     </button>
                     <button onClick={() => copyNode(node)}>
-                      <Copy size={16} className="mx-auto cursor-pointer" />
+                      <Copy size={18} className="mx-auto cursor-pointer" />
                     </button>
                     <button onClick={() => deleteNode(node.ID)}>
-                      <Delete size={16} className="mx-auto cursor-pointer" />
+                      <Trash size={18} className="mx-auto cursor-pointer" />
                     </button>
                   </div>
                 </td>
