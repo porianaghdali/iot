@@ -238,11 +238,11 @@ if (protocol === "Modbus") {
 
           <CustomSelect
             options={MBAddresstype}
-            value={sensorData.MBAddresstype}
+            value={sensorData.MB_Addresstype}
             onChange={(e) =>
               setSensorData((prev) => ({
                 ...prev,
-                MBAddresstype: e.target.value,
+                MB_Addresstype: e.target.value,
               }))
             }
             placeholder="MB_Addresstype   را انتخاب کنید"

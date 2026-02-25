@@ -54,7 +54,6 @@ const STATUS_CARDS = [
 
 export default function Card({ item }) {
   // گرفتن نودهای این zone
-
   const { subscribe, onMessage, offMessage } = useMqtt();
   const snmpStatusRef = useRef("idle");
   const [snmpResults, setSnmpResults] = useState([]); // آرایه برای چند جواب
@@ -69,15 +68,15 @@ export default function Card({ item }) {
     setSnmpStatusSafe("loading");
     setSnmpResults([]); // پاک کردن نتایج قبلی قبل از pull
 
-    const snmpTopic = `data/department/${item.ID || "+"}/+/+/+/get`;
+    const snmpTopic = `data/{department}/${item.ID || "+"}/+/+/+/get`;
+    console.log(snmpTopic)
     subscribe(snmpTopic);
 
     const handleMessage = (msg) => {
-      if (msg.destinationName.includes("/SNMP")) {
         const result = msg.payloadString || null;
         setSnmpResults((prev) => [...prev, result]);
         setSnmpStatusSafe(result ? "success" : "fail");
-      }
+      
     };
 
     onMessage(handleMessage);
@@ -87,17 +86,15 @@ export default function Card({ item }) {
       offMessage(handleMessage); // cleanup بعد از timeout
     }, 5000);
   };
-
+  console.log(snmpResults,"snmpResults",)
+  
   return (
     <>
       <div className="bg-background-box py-3 px-4 w-full rounded-xs">
-         <button onClick={handleSnmpPull} className="p-4 border mb-2">
-        تست اتصال
-      </button>
         {/* Header */}
         <div className="flex justify-between items-center text-text-secondary">
           <p className="text-sm font-normal">{item.zoneName}</p>
-
+<button onClick={handleSnmpPull}>ok</button>
           <div className="flex items-center gap-2">
             <button onClick={() => fetchNodes(item.ID)}>
               <RefreshCw />

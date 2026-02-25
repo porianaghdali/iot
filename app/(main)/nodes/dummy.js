@@ -32,7 +32,7 @@ export const initialSensorData = {
   ID: "",
   type: "",
   node: "",
-  MBAddresstype: "",
+  MB_Addresstype: "",
   sensorName: "",
   dataType: "",
   dataAddress: "",

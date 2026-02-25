@@ -37,7 +37,7 @@ export default function AddDeviceModal({
   const [editingIndex, setEditingIndex] = useState(null);
   const [sensorData, setSensorData] = useState(initialSensorData);
   const [combinedSensors, setCombinedSensors] = useState([]);
-
+console.log(sensorData,"sensorData")
   // Scan status
   const [scanStatus, setScanStatus] = useState("idle");
   const scanStatusRef = useRef("idle");
@@ -142,7 +142,7 @@ export default function AddDeviceModal({
     if (!combinedSensors.length) return;
     await createMultipleSensor(formData.ID, combinedSensors);
   };
-
+console.log(combinedSensors,"combinedSensors")
   // -------------------------
   // Steps content
   // -------------------------

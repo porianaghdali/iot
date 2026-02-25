@@ -83,8 +83,7 @@ export default function Systems() {
     setIsCreateModalOpen(true); // باز کردن مودال ساخت
   };
   if (loading) return <div>loading...</div>;
-console.log(nodes)
-  return (
+    return (
     <div className="w-full bg-background-main h-[calc(100vh-64px)] overflow-auto">
       <DevicesHeader openCreateModal={openCreateModal} />
 
@@ -146,7 +145,7 @@ console.log(nodes)
                   {node.protocol}
                 </td>
                 <td className="border-b border-border-main px-4 py-3 text-center text-text-tertiary text-xs font-normal">
-                  {node.config?.sensors || "-"}
+                  {node?.sensors.length || "-"}
                 </td>
                 <td className="border-b border-border-main px-4 py-3 text-center text-text-tertiary text-xs font-normal">
                   {node.lastLogin}
