@@ -113,7 +113,7 @@ if (protocol === "Modbus") {
   payload = {
     "ip": formData.ip,
     "port": Number(formData.config.port) || 502,
-    "slaveID": Number(formData.config.slaveID) || 1,
+    "slaveID": Number(sensorData.slaveID) || 1,
     "dataAddress": Number(sensorData.dataAddress),
     "length": getLengthFromDataType(sensorData.dataType),
     "dataType": sensorData.dataType,
@@ -265,6 +265,21 @@ if (protocol === "Modbus") {
           />
         </div>
       )}
+      {formData.protocol === "Modbus" && (
+              <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2] ">
+                <label className="text-text-title text-sm font-normal"> SLAVE </label>
+                <div className="flex gap-1 w-full max-w-[372px]">
+                  <CustomInput
+                    id="slaveID"
+                    placeholder=" slaveID را وارد کنید"
+                    name="slaveID"
+                    value={sensorData.slaveID}
+                    onChange={handleChange}
+                    format="number"
+                  />
+                </div>
+              </div>
+            )}
       <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2]">
         <label className="text-text-title text-sm font-normal">
           {" "}

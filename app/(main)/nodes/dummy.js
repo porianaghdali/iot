@@ -10,7 +10,6 @@ export const initialNodeFormData = {
   config: {
     version: "",
     port: "",
-    slaveID: "",
     authProtocol: "",
     authUser: "",
     authPass: "",
@@ -18,7 +17,7 @@ export const initialNodeFormData = {
     privPass: "",
     community: "",
   },
-}
+};
 export const tableHeaders = [
   { id: 1, title: "ردیف" },
   { id: 2, title: "نام" },
@@ -32,12 +31,15 @@ export const tableHeaders = [
 export const initialSensorData = {
   ID: "",
   type: "",
-  node: "",MBAddresstype:"",
+  node: "",
+  MBAddresstype: "",
   sensorName: "",
   dataType: "",
   dataAddress: "",
   oid: "",
   historySave: 0,
   active: 0,
+  slaveID: "",
+
   mqttValue: "",
 };

@@ -72,7 +72,7 @@ export default function StepTwo({ formData, handleChange }) {
       payload = {
         ip: formData.ip,
         port: formData.config.port || 502,
-        slaveID: formData.config.slaveID || 1,
+        slaveID: 0,
         dataAddress: formData.config.dataAddress || 0,
         length: formData.config.length || 1,
         dataType: formData.config.dataType || "Hex (2 Byte)",
@@ -81,7 +81,6 @@ export default function StepTwo({ formData, handleChange }) {
         MB_Addresstype: formData.config.addressType || "Register",
       };
     }
-console.log(payload,"payload")
     publish(pullTopic, JSON.stringify(payload));
 
     setTimeout(() => {
@@ -278,23 +277,7 @@ console.log(payload,"payload")
           </div>
         </div>
       )}
-      {formData.protocol === "Modbus" && (
-        <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2] ">
-          <label className="text-text-title text-sm font-normal"> SLAVE </label>
-          <div className="flex gap-1 w-full max-w-[372px]">
-            <CustomInput
-              id="slaveID"
-              placeholder=" slaveID را وارد کنید"
-              name="slaveID"
-              value={formData.config.slaveID}
-              onChange={(e) =>
-                handleChange(["config", "slaveID"], e.target.value)
-              }
-              format="number"
-            />
-          </div>
-        </div>
-      )}
+      
 
       <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2]">
         <label className="text-text-title text-sm font-normal">
