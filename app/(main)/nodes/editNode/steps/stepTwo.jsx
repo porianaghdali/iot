@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CustomInput from "../../../../../components/ui/customInput";
 import CustomSelect from "../../../../../components/ui/customSelect";
 import useMqtt from "@/hooks/useMqtt";
@@ -8,38 +8,37 @@ export default function StepTwo({ formData, handleChange }) {
   const [snmpResult, setSnmpResult] = useState(null);
   const [snmpStatus, setSnmpStatus] = useState("idle");
   const snmpStatusRef = useRef("idle");
+  const randomNodeRef = useRef(null);
+
+  useEffect(() => {
+    randomNodeRef.current = "node-" + Math.random().toString(36).slice(2, 8);
+  }, []);
   const setSnmpStatusSafe = (status) => {
     snmpStatusRef.current = status;
     setSnmpStatus(status);
   };
   const { publish, subscribe, onMessage, offMessage, connected } = useMqtt();
 
-  const handleSnmpPull = () => {
-    if (!formData.ip) return;
+  const handleConnectionTest = () => {
+    if (!formData.ip || !randomNodeRef.current) return;
 
     setSnmpStatusSafe("loading");
 
-    const snmpPullTopic = `data/${formData.department || "default"}/${formData.zone || "default"}/node/${formData.sensor || "default"}/SNMP/pull`;
+    const protocol = formData.protocol || "SNMP";
 
-    const payload = {
-      ip: formData.ip,
-      oid: formData.config.oid || ".1.3.6.1.2.1.1.3.0",
-      version: formData.config.version || null,
-      authProtocol: formData.config.authProtocol || null,
-      authUser: formData.config.authUser || null,
-      authPass: formData.config.authPass || null,
-      privProtocol: formData.config.privProtocol || "DES",
-      privPass: formData.config.privPass || null,
-      community: formData.config.community || null,
-    };
+    const pullTopic = `data/${formData.department || "default"}/${formData.zone || "default"}/${randomNodeRef.current}/${formData.sensor || "default"}/${protocol}/pull`;
 
-    // subscribe به topic جواب SNMP
-    const snmpTopic = `data/${formData.department || "+"}/${formData.zone || "+"}/node/${formData.sensor || "+"}/SNMP/+`;
-    subscribe(snmpTopic);
+    const responseTopic = `data/${formData.department || "+"}/${formData.zone || "+"}/${randomNodeRef.current}/${formData.sensor || "+"}/${protocol}/+`;
+
+    subscribe(responseTopic);
 
     const handleMessage = (msg) => {
-      if (msg.destinationName.includes("/SNMP")) {
-        const result = msg.payloadString;
+      if (
+        msg.destinationName.includes(`/${protocol}/get`) ||
+        msg.destinationName.includes(`/${protocol}/alert`)
+      ) {
+        const result = msg.payloadString.trim();
+
         if (result) {
           setSnmpStatusSafe("success");
           setSnmpResult(result);
@@ -52,16 +51,45 @@ export default function StepTwo({ formData, handleChange }) {
 
     onMessage(handleMessage);
 
-    // publish
-    publish(snmpPullTopic, JSON.stringify(payload));
+    // 🔥 payload بر اساس پروتکل
+    let payload = {};
 
-    // timeout برای جلوگیری از stuck شدن
+    if (protocol === "SNMP") {
+      payload = {
+        ip: formData.ip,
+        oid: formData.config.oid || ".1.3.6.1.2.1.1.3.0",
+        version: formData.config.version || null,
+        authProtocol: formData.config.authProtocol || null,
+        authUser: formData.config.authUser || null,
+        authPass: formData.config.authPass || null,
+        privProtocol: formData.config.privProtocol || "DES",
+        privPass: formData.config.privPass || null,
+        community: formData.config.community || null,
+      };
+    }
+
+    if (protocol === "Modbus") {
+      payload = {
+        ip: formData.ip,
+        port: formData.config.port || 502,
+        slaveID: 0,
+        dataAddress: formData.config.dataAddress || 0,
+        length: formData.config.length || 1,
+        dataType: formData.config.dataType || "Hex (2 Byte)",
+        timeout: formData.config.timeout || 5,
+        protocol: formData.config.version || "TCP", // TCP یا UDP
+        MB_Addresstype: formData.config.addressType || "Register",
+      };
+    }
+    publish(pullTopic, JSON.stringify(payload));
+
     setTimeout(() => {
-      if (snmpStatusRef.current === "loading") setSnmpStatusSafe("fail");
-      offMessage(handleMessage); // cleanup بعد از timeout
+      if (snmpStatusRef.current === "loading") {
+        setSnmpStatusSafe("fail");
+      }
+      offMessage(handleMessage);
     }, 5000);
   };
-
   const protocolOptions = [
     { label: "SNMP", value: "SNMP" },
     { label: "Modbus", value: "Modbus" },
@@ -89,6 +117,8 @@ export default function StepTwo({ formData, handleChange }) {
           onChange={(e) => {
             handleChange(["protocol"], e.target.value);
             handleChange(["config", "version"], "");
+            setSnmpStatusSafe("idle");
+            setSnmpResult(null);
           }}
         />
       </div>
@@ -242,22 +272,7 @@ export default function StepTwo({ formData, handleChange }) {
               textAlign="left"
               value={formData.config.port}
               onChange={(e) => handleChange(["config", "port"], e.target.value)}
-            />
-          </div>
-        </div>
-      )}
-      {formData.protocol === "Modbus" && (
-        <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2] ">
-          <label className="text-text-title text-sm font-normal"> SLAVE </label>
-          <div className="flex gap-1 w-full max-w-[372px]">
-            <CustomInput
-              id="slaveID"
-              placeholder=" slaveID را وارد کنید"
-              name="slaveID"
-              value={formData.config.slaveID}
-              onChange={(e) =>
-                handleChange(["config", "slaveID"], e.target.value)
-              }
+              format="number"
             />
           </div>
         </div>
@@ -275,6 +290,7 @@ export default function StepTwo({ formData, handleChange }) {
               placeholder="زمان نمونه گیری را وارد کنید"
               value={formData.interval}
               onChange={(e) => handleChange(["interval"], e.target.value)}
+              format="number"
             />
           </div>
           <p className="text-text-tertiary text-sm font-normal">ثانیه</p>
@@ -285,20 +301,23 @@ export default function StepTwo({ formData, handleChange }) {
         <label className="text-text-title text-sm font-normal">تست اتصال</label>
         <div className="flex gap-1 w-full max-w-[372px] items-center justify-end">
           <button
-            onClick={handleSnmpPull}
+            onClick={handleConnectionTest}
             className="border border-border-muted w-3/5 p-2.5 rounded bg-[#C1C1C133]"
           >
             تست
           </button>
         </div>
       </div>
-      {snmpStatus !== "idle" && (
-        <div className="text-sm mt-1">
-          {snmpStatus === "loading" && "⏳ در حال دریافت داده SNMP..."}
-          {snmpStatus === "success" && `✅ نتیجه: ${snmpResult}`}
-          {snmpStatus === "fail" && "❌ دریافت داده SNMP ناموفق بود"}
-        </div>
-      )}
+      <div className="text-sm mt-1">
+        {snmpStatus === "loading" &&
+          `⏳ در حال دریافت داده ${formData.protocol || "SNMP"} ...`}
+
+        {snmpStatus === "success" &&
+          `✅ نتیجه ${formData.protocol || "SNMP"}: ${snmpResult}`}
+
+        {snmpStatus === "fail" &&
+          `❌ دریافت داده ${formData.protocol || "SNMP"} ناموفق بود`}
+      </div>
     </div>
   );
 }

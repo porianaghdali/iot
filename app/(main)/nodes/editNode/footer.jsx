@@ -9,7 +9,6 @@ export default function Footer({
 }) {
   const handleSubmit = async () => {
     const newId = await handleSaveNode();
-
     if (newId) {
       // حالا می‌تونی مستقیماً از newId استفاده کنی
     }

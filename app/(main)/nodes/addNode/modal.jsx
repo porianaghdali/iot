@@ -1,17 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { X } from "lucide-react";
+
+import Header from "./header";
+import Footer from "./footer";
+import LeftImage from "./leftImage";
 import SensorList from "./sensorList";
 import StepOne from "./steps/stepOne";
 import StepTwo from "./steps/stepTwo";
 import StepThree from "./steps/stepThree";
-import Header from "./header";
-import Footer from "./footer";
-import LeftImage from "./leftImage";
+
 import useMqtt from "@/hooks/useMqtt";
 import { useSensors } from "@/hooks/useSensors";
 import { getTokenFromCookie } from "@/utils/functions/auth";
-import { X } from "lucide-react";
 import { initialSensorData } from "../dummy";
 
 export default function AddDeviceModal({
@@ -24,55 +26,47 @@ export default function AddDeviceModal({
   handleChange,
 }) {
   const token = useMemo(() => getTokenFromCookie("token"), []);
+
+  // MQTT
   const { publish, subscribe, onMessage, offMessage, connected } = useMqtt();
-  const { getList, sensorList,  createMultipleSensor } =
-    useSensors(token);
+
+  // Sensors hook
+  const { getList, sensorList, createMultipleSensor } = useSensors(token);
+
+  // Form & sensors state
   const [editingIndex, setEditingIndex] = useState(null);
-  // فرم سنسور
   const [sensorData, setSensorData] = useState(initialSensorData);
-  // ⭐ لیست نهایی سنسورها (همه چی اینجاست)
   const [combinedSensors, setCombinedSensors] = useState([]);
 
-  // وضعیت اسکن
+  // Scan status
   const [scanStatus, setScanStatus] = useState("idle");
   const scanStatusRef = useRef("idle");
 
   // -------------------------
-  // گرفتن سنسورهای ثبت‌شده از سرور
+  // Fetch sensors from server when formData.ID changes
   // -------------------------
   useEffect(() => {
-    if (!formData.ID) return;
-    getList(formData.ID);
+    if (formData.ID) getList(formData.ID);
   }, [formData.ID]);
 
-  // وقتی سنسورهای سرور آمد → اضافه به لیست نهایی
+  // Merge server sensors into combined list
   useEffect(() => {
-    const saved = sensorList.map((item) => ({
-      ...item,
-      status: "saved",
-    }));
+    const saved = sensorList.map((item) => ({ ...item, status: "saved" }));
     setCombinedSensors(saved);
   }, [sensorList]);
 
   // -------------------------
-  // افزودن سنسور دستی
+  // Add or edit sensor manually
   // -------------------------
   const handleAddSensor = () => {
-    const sensor = {
-      ...sensorData,
-      node: formData.ID,
-      status: "pending",
-    };
+    const sensor = { ...sensorData, node: formData.ID, status: "pending" };
 
     if (editingIndex !== null) {
-      // ✏️ حالت ویرایش
       setCombinedSensors((prev) =>
         prev.map((item, i) => (i === editingIndex ? sensor : item)),
       );
-
       setEditingIndex(null);
     } else {
-      // ➕ حالت افزودن
       setCombinedSensors((prev) => [...prev, sensor]);
     }
 
@@ -80,21 +74,15 @@ export default function AddDeviceModal({
   };
 
   // -------------------------
-  // حذف سنسور
-  // -------------------------
-
-  // -------------------------
-  // ادیت سنسور
+  // Edit sensor selection
   // -------------------------
   const handleSelectSensorForEdit = (index) => {
-    const sensor = combinedSensors[index];
-
-    setSensorData(sensor); // پر کردن فرم
-    setEditingIndex(index); // مشخص کردن آیتم
+    setSensorData(combinedSensors[index]);
+    setEditingIndex(index);
   };
 
   // -------------------------
-  // اسکن سنسور از MQTT
+  // MQTT sensor scan
   // -------------------------
   const setScanStatusSafe = (status) => {
     scanStatusRef.current = status;
@@ -120,14 +108,11 @@ export default function AddDeviceModal({
         setScanStatusSafe("success");
 
         try {
-          const parsed = JSON.parse(result);
-
-          const scanned = parsed.map((item) => ({
+          const scanned = JSON.parse(result).map((item) => ({
             ...item,
             status: "scanned",
           }));
 
-          // ⭐ اضافه به لیست کلی
           setCombinedSensors((prev) => [...prev, ...scanned]);
         } catch {
           console.error("Invalid scan data");
@@ -140,7 +125,6 @@ export default function AddDeviceModal({
     };
 
     onMessage(handleMessage);
-
     publish(pullTopic, JSON.stringify({}), { qos: 2 });
 
     setTimeout(() => {
@@ -152,17 +136,15 @@ export default function AddDeviceModal({
   };
 
   // -------------------------
-  // ذخیره همه سنسورها در بک‌اند
+  // Save all sensors to backend
   // -------------------------
-  const handleSaveAllSensors = async () => {console.log(combinedSensors,formData.ID)
-     if ( !combinedSensors.length) return;
-  
-
+  const handleSaveAllSensors = async () => {
+    if (!combinedSensors.length) return;
     await createMultipleSensor(formData.ID, combinedSensors);
   };
 
   // -------------------------
-  // مراحل مودال
+  // Steps content
   // -------------------------
   const steps = {
     1: <StepOne formData={formData} handleChange={handleChange} />,
@@ -173,7 +155,7 @@ export default function AddDeviceModal({
         setSensorData={setSensorData}
         formData={formData}
         handleAddSensors={handleAddSensor}
-        isEditing={editingIndex !== null} // ⭐ اضافه
+        isEditing={editingIndex !== null}
         handleChange={(e) =>
           setSensorData((prev) => ({
             ...prev,
@@ -183,14 +165,17 @@ export default function AddDeviceModal({
       />
     ),
   };
-console.log(combinedSensors,"combinedSensors")
+
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Overlay */}
       <div className="absolute inset-0 bg-[#0D0D0D26]" onClick={handleClose} />
 
+      {/* Modal container */}
       <div className="relative flex w-[90%] h-[90%] rounded-md bg-white shadow-lg overflow-hidden">
+        {/* Close button */}
         <button
           onClick={handleClose}
           className="absolute top-4 right-4 p-1 rounded-full border"
@@ -198,12 +183,10 @@ console.log(combinedSensors,"combinedSensors")
           <X size={16} />
         </button>
 
-        {/* سمت چپ */}
+        {/* Left section */}
         <div className="w-full xl:w-3/5 px-[6%] py-[5%] overflow-auto">
           <Header step={step} />
-
           <div className="space-y-2 text-xs">{steps[step]}</div>
-
           <Footer
             step={step}
             setStep={setStep}
@@ -212,7 +195,7 @@ console.log(combinedSensors,"combinedSensors")
           />
         </div>
 
-        {/* سمت راست */}
+        {/* Right section */}
         {step === 3 ? (
           <SensorList
             scanStatus={scanStatus}

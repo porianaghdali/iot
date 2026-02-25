@@ -37,8 +37,8 @@ export const initialSensorData = {
   dataType: "",
   dataAddress: "",
   oid: "",
-  historySave: 0,
-  active: 0,
+  historySave: 1,
+  active: 1,
   slaveID: "",
 
   mqttValue: "",

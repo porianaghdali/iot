@@ -1,156 +1,151 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { X } from "lucide-react";
+
+import Header from "./header";
+import Footer from "./footer";
+import LeftImage from "./leftImage";
 import SensorList from "./sensorList";
 import StepOne from "./steps/stepOne";
 import StepTwo from "./steps/stepTwo";
 import StepThree from "./steps/stepThree";
-import Header from "./header";
-import Footer from "./footer";
-import LeftImage from "./leftImage";
-import useMqtt from "@/hooks/useMqtt";
 
+import useMqtt from "@/hooks/useMqtt";
 import { useSensors } from "@/hooks/useSensors";
 import { getTokenFromCookie } from "@/utils/functions/auth";
-import { X } from "lucide-react";
+import { initialSensorData } from "../dummy";
 
-const initialSensorData = {
-  ID: "",
-  type: "",
-  node: "",
-  sensorName: "",
-  dataType: "",
-  dataAddress: "",
-  oid: "",
-  historySave: 0,
-  active: 0,
-  mqttValue: "",
-};
-export default function EditModal({
+export default function EditNodeModal({
   open,
   formData,
-  setFormData,
   handleClose,
   step,
   setStep,
   handleSaveNode,
-  onSaveSensors,
   handleChange,
 }) {
   const token = useMemo(() => getTokenFromCookie("token"), []);
+
+  // MQTT
   const { publish, subscribe, onMessage, offMessage, connected } = useMqtt();
 
-  const { getList, sensorList, createSensors, deleteSensorById } =
-    useSensors(token);
+  // Sensors hook
+  const { getList, sensorList, createMultipleSensor } = useSensors(token);
 
-  // Current sensor form
+  // Form & sensors state
+  const [editingIndex, setEditingIndex] = useState(null);
   const [sensorData, setSensorData] = useState(initialSensorData);
+  const [combinedSensors, setCombinedSensors] = useState([]);
 
-  // Sensors waiting to be saved
-  const [pendingSensors, setPendingSensors] = useState([]);
-
-  const [scanResult, setScanResult] = useState(null);
+  // Scan status
   const [scanStatus, setScanStatus] = useState("idle");
-
   const scanStatusRef = useRef("idle");
 
+  // -------------------------
+  // Fetch sensors from server when formData.ID changes
+  // -------------------------
+  useEffect(() => {
+    if (formData.ID) getList(formData.ID);
+  }, [formData.ID]);
+
+  // Merge server sensors into combined list
+  useEffect(() => {
+    const saved = sensorList.map((item) => ({ ...item, status: "saved" }));
+    setCombinedSensors(saved);
+  }, [sensorList]);
+
+  // -------------------------
+  // Add or edit sensor manually
+  // -------------------------
+  const handleAddSensor = () => {
+    const sensor = { ...sensorData, node: formData.ID, status: "pending" };
+
+    if (editingIndex !== null) {
+      setCombinedSensors((prev) =>
+        prev.map((item, i) => (i === editingIndex ? sensor : item)),
+      );
+      setEditingIndex(null);
+    } else {
+      setCombinedSensors((prev) => [...prev, sensor]);
+    }
+
+    setSensorData(initialSensorData);
+  };
+
+  // -------------------------
+  // Edit sensor selection
+  // -------------------------
+  const handleSelectSensorForEdit = (index) => {
+    setSensorData(combinedSensors[index]);
+    setEditingIndex(index);
+  };
+
+  // -------------------------
+  // MQTT sensor scan
+  // -------------------------
   const setScanStatusSafe = (status) => {
     scanStatusRef.current = status;
     setScanStatus(status);
   };
+
   const handleSensorScan = () => {
-    if (!connected) {
-      return;
-    }
+    if (!connected) return;
 
     setScanStatusSafe("loading");
 
-    // 🔹 topic ثابت
     const pullTopic = `web/{department}/user/1/sensor-scan/${formData.ID}/pull`;
     const responseTopic = `web/{department}/user/1/sensor-scan/${formData.ID}/get`;
 
-    // subscribe به جواب
     subscribe(responseTopic);
 
     const handleMessage = (msg) => {
       if (msg.destinationName !== responseTopic) return;
 
       const result = msg.payloadString;
+
       if (result) {
         setScanStatusSafe("success");
+
         try {
-          setScanResult(JSON.parse(result));
+          const scanned = JSON.parse(result).map((item) => ({
+            ...item,
+            status: "scanned",
+          }));
+
+          setCombinedSensors((prev) => [...prev, ...scanned]);
         } catch {
-          setScanResult(result);
+          console.error("Invalid scan data");
         }
       } else {
         setScanStatusSafe("fail");
-        setScanResult(null);
       }
 
-      offMessage(handleMessage); // cleanup بعد از دریافت پیام
+      offMessage(handleMessage);
     };
 
     onMessage(handleMessage);
-
-    // 🔹 publish درخواست scan
     publish(pullTopic, JSON.stringify({}), { qos: 2 });
 
-    // 🔹 timeout برای جلوگیری از گیر کردن
     setTimeout(() => {
       if (scanStatusRef.current === "loading") {
         setScanStatusSafe("fail");
         offMessage(handleMessage);
       }
-    }, 7000);
+    }, 70000);
   };
 
-  // Fetch sensors when node ID exists
-  useEffect(() => {
-    if (!formData.ID) return;
-    getList(formData.ID);
-  }, [formData.ID]);
-
-  // Handle sensor input change
-  const handleSensorChange = (e) => {
-    const { name, value } = e.target;
-
-    setSensorData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  // Add sensor to pending list
-  const handleAddSensor = () => {
-    const sensor = {
-      ...sensorData,
-      node: formData.ID, // attach node id
-    };
-
-    setPendingSensors((prev) => [...prev, sensor]);
-    setSensorData(initialSensorData);
-  };
-
-  // Save all sensors to server
+  // -------------------------
+  // Save all sensors to backend
+  // -------------------------
   const handleSaveAllSensors = async () => {
-    if (!formData.ID || !pendingSensors.length) return;
-
-    await createSensors(pendingSensors, formData.ID);
-    await getList(formData.ID);
-
-    setPendingSensors([]);
-    // handleClose();
+    if (!combinedSensors.length) return;
+    await createMultipleSensor(formData.ID, combinedSensors);
   };
-  const handleDeletSensors = async (ID) => {
-    if (!formData.ID) return;
 
-    await deleteSensorById(ID, formData.ID);
-    await getList(formData.ID);
-
-    setPendingSensors([]);
-    // handleClose();
-  };
+  // -------------------------
+  // Steps content
+  // -------------------------
   const steps = {
     1: <StepOne formData={formData} handleChange={handleChange} />,
     2: <StepTwo formData={formData} handleChange={handleChange} />,
@@ -160,27 +155,37 @@ export default function EditModal({
         setSensorData={setSensorData}
         formData={formData}
         handleAddSensors={handleAddSensor}
-        handleChange={handleSensorChange}
+        isEditing={editingIndex !== null}
+        handleChange={(e) =>
+          setSensorData((prev) => ({
+            ...prev,
+            [e.target.name]: e.target.value,
+          }))
+        }
       />
     ),
   };
+
   if (!open) return null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-[#0D0D0D26] z-0"
-        onClick={handleClose}
-      />
-      <div className="relative z-10 flex w-[90%] h-[90%] overflow-hidden rounded-md bg-white shadow-[0px_0px_12px_2px_#00000014]">
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-[#0D0D0D26]" onClick={handleClose} />
+
+      {/* Modal container */}
+      <div className="relative flex w-[90%] h-[90%] rounded-md bg-white shadow-lg overflow-hidden">
+        {/* Close button */}
         <button
-          onClick={handleSensorScan}
-          className=" absolute top-4 right-4 p-1 rounded-full border
-      "
+          onClick={handleClose}
+          className="absolute top-4 right-4 p-1 rounded-full border"
         >
           <X size={16} />
-        </button>{" "}
-        <div className="w-full xl:w-3/5 h-full px-[6%] py-[5%] overflow-auto">
-          <Header step={step} setStep={setStep} />
+        </button>
+
+        {/* Left section */}
+        <div className="w-full xl:w-3/5 px-[4%] py-[3%] overflow-auto">
+          <Header step={step} setStep={setStep}/>
           <div className="space-y-2 text-xs">{steps[step]}</div>
           <Footer
             step={step}
@@ -189,15 +194,15 @@ export default function EditModal({
             handleSaveAllSensors={handleSaveAllSensors}
           />
         </div>
+
+        {/* Right section */}
         {step === 3 ? (
           <SensorList
-            sensorList={sensorList}
-            formData={formData}
-            pendingSensors={pendingSensors}
-            setPendingSensors={setPendingSensors}
+            scanStatus={scanStatus}
             handleSensorScan={handleSensorScan}
-            scanResult={scanResult}
-            handleDeletSensors={handleDeletSensors}
+            sensorList={combinedSensors}
+            setSensorList={setCombinedSensors}
+            onEdit={handleSelectSensorForEdit}
           />
         ) : (
           <LeftImage />

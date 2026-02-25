@@ -1,13 +1,15 @@
 "use client";
-import DevicesHeader from "./devicesHeader";
+
+import { useEffect, useMemo, useState } from "react";
 import { Bell, Copy, Delete, Edit, ListFilter } from "lucide-react";
+
+import DevicesHeader from "./devicesHeader";
 import AddNodeModal from "./addNode/modal";
 import EditNodeModal from "./editNode/modal";
+import Dialog from "@/components/ui/dialog";
 import { getTokenFromCookie } from "@/utils/functions/auth";
 import { useNodes } from "@/hooks/useNodes";
-import { useEffect, useMemo, useState } from "react";
 import { initialNodeFormData, tableHeaders } from "./dummy";
-import Dialog from "@/components/ui/dialog";
 
 export default function Systems() {
   const token = useMemo(() => getTokenFromCookie("token"), []);
@@ -22,13 +24,15 @@ export default function Systems() {
 
   // Form data
   const [nodeFormData, setNodeFormData] = useState(initialNodeFormData);
-  const { nodes, loading, error, fetchNodes, createNode, deleteNode } =
+
+  const { nodes, loading, fetchNodes, createNode, deleteNode } =
     useNodes(token);
 
   useEffect(() => {
     fetchNodes();
   }, []);
 
+  // Handle form input changes
   const handleChange = (path, value) => {
     setNodeFormData((prev) => {
       const updated = { ...prev };
@@ -43,25 +47,27 @@ export default function Systems() {
       return updated;
     });
   };
-  //Modal handler
-  const openCreateModal = () => {
-    setIsCreateModalOpen(true);
-  };
+
+  // Modal handlers
+  const openCreateModal = () => setIsCreateModalOpen(true);
   const openEditModal = (node) => {
     setNodeFormData(node);
     setIsEditModalOpen(true);
   };
+
   const closeCreateModal = () => {
     setNodeFormData(initialNodeFormData);
     setCreateStep(1);
     setIsCreateModalOpen(false);
   };
+
   const closeEditModal = () => {
     setNodeFormData(initialNodeFormData);
     setEditStep(1);
     setIsEditModalOpen(false);
   };
-  //Save Node
+
+  // Save node
   const saveNode = async () => {
     const newId = await createNode(nodeFormData);
     if (newId) {
@@ -69,7 +75,15 @@ export default function Systems() {
     }
     return newId;
   };
+  // اضافه کردن تابع کپی نود
+  const copyNode = (node) => {
+    const copiedNode = { ...node, ID: "", deviceName: "" }; // پاک کردن ID و اسم
+    setNodeFormData(copiedNode);
+    setCreateStep(1); // اگر فرم چندمرحله‌ایه، مرحله اول باشه
+    setIsCreateModalOpen(true); // باز کردن مودال ساخت
+  };
   if (loading) return <div>loading...</div>;
+
   return (
     <div className="w-full bg-background-main h-[calc(100vh-64px)] overflow-auto">
       <DevicesHeader openCreateModal={openCreateModal} />
@@ -109,6 +123,7 @@ export default function Systems() {
               <th className="border-b border-border-main px-4 py-3 text-center text-text-title text-xs font-normal"></th>
             </tr>
           </thead>
+
           <tbody>
             {nodes.map((node, index) => (
               <tr key={node.ID}>
@@ -141,14 +156,13 @@ export default function Systems() {
                 </td>
                 <td className="border-b border-border-main text-center text-text-tertiary text-xs font-normal">
                   <div className="flex gap-4 px-4 py-3">
-                    <button onClick={() => deleteNode(node.ID)}>
+                    <button>
                       <Bell size={16} className="mx-auto cursor-pointer" />
                     </button>
                     <button onClick={() => openEditModal(node)}>
                       <Edit size={16} className="mx-auto cursor-pointer" />
                     </button>
-
-                    <button onClick={() => deleteNode(node.ID)}>
+                    <button onClick={() => copyNode(node)}>
                       <Copy size={16} className="mx-auto cursor-pointer" />
                     </button>
                     <button onClick={() => deleteNode(node.ID)}>
@@ -175,11 +189,11 @@ export default function Systems() {
       />
 
       <EditNodeModal
-        formData={nodeFormData}
         open={isEditModalOpen}
+        formData={nodeFormData}
         step={editStep}
         setStep={setEditStep}
-        handleClose={closeCreateModal}
+        handleClose={closeEditModal}
         handleSaveNode={saveNode}
         handleChange={handleChange}
         setFormData={setNodeFormData}

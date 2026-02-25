@@ -1,7 +1,9 @@
 "use client";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import CustomInput from "../../../../../components/ui/customInput";
 import CustomSelect from "../../../../../components/ui/customSelect";
+
 import useMqtt from "@/hooks/useMqtt";
 import { useZones } from "@/hooks/useZones";
 import { getTokenFromCookie } from "@/utils/functions/auth";
@@ -9,47 +11,52 @@ import { getTokenFromCookie } from "@/utils/functions/auth";
 export default function StepOne({ formData, handleChange }) {
   const token = useMemo(() => getTokenFromCookie("token"), []);
 
-  /* ---------------- ZONES ---------------- */
-
+  // ---------------- ZONES ----------------
   const { zones, getZonesList } = useZones(token);
 
   useEffect(() => {
     getZonesList();
   }, []);
+
   const zoneOptions = zones.map((z) => ({
     label: z.zoneName,
     value: z.ID,
   }));
-  /* ---------------- MQTT ---------------- */
+
+  // ---------------- MQTT ----------------
   const { publish, subscribe, onMessage, offMessage, connected } = useMqtt();
+
   const [pingStatus, setPingStatus] = useState("idle");
   const [latency, setLatency] = useState(null);
+
   const macStatusRef = useRef("idle");
+  const pingStatusRef = useRef("idle");
   const randomNodeRef = useRef(null);
-  /* ---------------- HELPERS ---------------- */
+
+  // ---------------- HELPERS ----------------
   const setMacStatusSafe = (status) => {
     macStatusRef.current = status;
   };
-  const pingStatusRef = useRef("idle");
+
   const setPingStatusSafe = (status) => {
     pingStatusRef.current = status;
     setPingStatus(status);
   };
+
   useEffect(() => {
     randomNodeRef.current = "node-" + Math.random().toString(36).slice(2, 8);
   }, []);
-  // subscribe به topic جواب ping
+
+  // ---------------- SUBSCRIBE PING ----------------
   useEffect(() => {
     if (!connected || !randomNodeRef.current) return;
 
     const pingTopic = `data/${formData.department || "+"}/${formData.zone || "+"}/${randomNodeRef.current}/${formData.sensor || "+"}/Network/ping/+`;
-
     subscribe(pingTopic);
 
     const handleMessage = (msg) => {
       if (msg.destinationName.includes("/ping")) {
         const result = msg.payloadString;
-
         if (result.includes("ms")) {
           setPingStatusSafe("success");
           setLatency(result);
@@ -60,32 +67,23 @@ export default function StepOne({ formData, handleChange }) {
     };
 
     onMessage(handleMessage);
-
-    return () => {
-      offMessage(handleMessage);
-    };
+    return () => offMessage(handleMessage);
   }, [connected, formData.department, formData.zone, formData.sensor]);
 
+  // ---------------- ACTIONS ----------------
   const handlePing = () => {
     if (!formData.ip) return;
 
     setPingStatusSafe("loading");
 
     const pingPullTopic = `data/${formData.department || "default"}/${formData.zone || "default"}/${randomNodeRef.current}/${formData.sensor || "default"}/Network/ping/pull`;
-    // data/{department}/{zone}/"node"/{sensor}/Network/ping/pull
-    const payload = JSON.stringify({
-      ip: formData.ip,
-      count: 1,
-      wait: 1000,
-    });
+    const payload = JSON.stringify({ ip: formData.ip, count: 1, wait: 1000 });
 
     publish(pingPullTopic, payload);
 
-    // timeout برای جلوگیری از stuck شدن
+    // timeout برای جلوگیری از گیر کردن
     setTimeout(() => {
-      if (pingStatusRef.current === "loading") {
-        setPingStatusSafe("fail");
-      }
+      if (pingStatusRef.current === "loading") setPingStatusSafe("fail");
     }, 5000);
   };
 
@@ -97,7 +95,6 @@ export default function StepOne({ formData, handleChange }) {
     const arpPullTopic = `data/${formData.department || "default"}/${formData.zone || "default"}/node/${formData.sensor || "default"}/Network/arp/pull`;
     const payload = JSON.stringify({ ip: formData.ip });
 
-    // subscribe به topic جواب arp
     const arpTopic = `data/${formData.department || "+"}/${formData.zone || "+"}/node/${formData.sensor || "+"}/Network/arp/+`;
     subscribe(arpTopic);
 
@@ -106,7 +103,7 @@ export default function StepOne({ formData, handleChange }) {
         const result = msg.payloadString;
         if (result) {
           setMacStatusSafe("success");
-          handleChange(["mac"], result); // update فرم هم
+          handleChange(["mac"], result);
         } else {
           setMacStatusSafe("fail");
         }
@@ -114,23 +111,20 @@ export default function StepOne({ formData, handleChange }) {
     };
 
     onMessage(handleMessage);
-
-    // publish
     publish(arpPullTopic, payload);
 
-    // timeout برای جلوگیری از stuck شدن
     setTimeout(() => {
       if (macStatusRef.current === "loading") setMacStatusSafe("fail");
-      offMessage(handleMessage); // cleanup بعد از timeout
+      offMessage(handleMessage);
     }, 5000);
   };
+
+  // ---------------- RENDER ----------------
   return (
     <div className="space-y-4">
       {/* Device Name */}
       <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2]">
-        <label className="text-text-title text-sm font-normal">
-          نام دستگاه
-        </label>
+        <label className="text-text-title text-sm font-normal">نام دستگاه</label>
         <CustomInput
           placeholder="نام دستگاه را وارد کنید"
           id="deviceName"
@@ -150,21 +144,20 @@ export default function StepOne({ formData, handleChange }) {
           textAlign="left"
           dir="ltr"
           value={formData.ip}
-          onChange={(e) => handleChange(["ip"], e.target.value)}          
-
+          onChange={(e) => handleChange(["ip"], e.target.value)}
         />
       </div>
-      <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2] ">
-        <label className="text-text-title text-sm font-normal"> MAC</label>
+
+      {/* MAC */}
+      <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2]">
+        <label className="text-text-title text-sm font-normal">MAC</label>
         <div className="flex gap-1 w-full max-w-[372px]">
           <CustomInput
             id="mac"
             name="mac"
             placeholder="آدرس MAC خود را وارد کنید"
             value={formData.mac}
-            onChange={(e) => {
-              handleChange(["mac"], e.target.value);
-            }}
+            onChange={(e) => handleChange(["mac"], e.target.value)}
           />
           <button
             onClick={handleMacPull}
@@ -180,13 +173,13 @@ export default function StepOne({ formData, handleChange }) {
         <label className="text-text-title text-sm font-normal">ناحیه</label>
         <CustomSelect
           options={zoneOptions}
-          value={formData.zone}
-          onChange={(e) => handleChange(["zone"], e.target.value)}
+          value={Number(formData.zone)}
+          onChange={(e) => handleChange(["zone"], Number(e.target.value))}
           placeholder="ناحیه را انتخاب کنید"
         />
       </div>
 
-      {/* تست اتصال */}
+      {/* Ping Test */}
       <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2]">
         <label className="text-text-title text-sm font-normal">تست اتصال</label>
         <div className="flex gap-1 w-full max-w-[372px] items-center justify-end">
@@ -199,7 +192,7 @@ export default function StepOne({ formData, handleChange }) {
         </div>
       </div>
 
-      {/* نمایش نتیجه */}
+      {/* Ping Result */}
       {pingStatus !== "idle" && (
         <div className="text-sm mt-2">
           {pingStatus === "loading" && "⏳ در حال بررسی اتصال..."}

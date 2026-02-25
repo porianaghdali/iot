@@ -277,7 +277,6 @@ export default function StepTwo({ formData, handleChange }) {
           </div>
         </div>
       )}
-      
 
       <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2]">
         <label className="text-text-title text-sm font-normal">
