@@ -25,11 +25,11 @@ export default function AddDeviceModal({
 }) {
   const token = useMemo(() => getTokenFromCookie("token"), []);
   const { publish, subscribe, onMessage, offMessage, connected } = useMqtt();
-  const { getList, sensorList, createSensors,createMultipleSensor } = useSensors(token);
+  const { getList, sensorList,  createMultipleSensor } =
+    useSensors(token);
   const [editingIndex, setEditingIndex] = useState(null);
   // فرم سنسور
   const [sensorData, setSensorData] = useState(initialSensorData);
-
   // ⭐ لیست نهایی سنسورها (همه چی اینجاست)
   const [combinedSensors, setCombinedSensors] = useState([]);
 
@@ -157,7 +157,7 @@ export default function AddDeviceModal({
   const handleSaveAllSensors = async () => {
     if (!formData.ID || !combinedSensors.length) return;
 
-    await createMultipleSensor(formData.ID,combinedSensors );
+    await createMultipleSensor(formData.ID, combinedSensors);
   };
 
   // -------------------------

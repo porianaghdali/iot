@@ -7,7 +7,6 @@ import OID from "./components/OID";
 
 export default function System() {
   const [selected, setSelected] = useState(1);
-  console.log(selected, "se");
   return (
     <div className="w-full bg-background-main h-[calc(100vh-64px)] overflow-auto ">
       <SystemHeader setSelected={setSelected} selected={selected} />

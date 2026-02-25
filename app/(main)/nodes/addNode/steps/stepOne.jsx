@@ -150,7 +150,8 @@ export default function StepOne({ formData, handleChange }) {
           textAlign="left"
           dir="ltr"
           value={formData.ip}
-          onChange={(e) => handleChange(["ip"], e.target.value)}
+          onChange={(e) => handleChange(["ip"], e.target.value)}          
+
         />
       </div>
       <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#E0E0E2] ">

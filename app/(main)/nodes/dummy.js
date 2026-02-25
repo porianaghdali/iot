@@ -32,7 +32,7 @@ export const tableHeaders = [
 export const initialSensorData = {
   ID: "",
   type: "",
-  node: "",
+  node: "",MBAddresstype:"",
   sensorName: "",
   dataType: "",
   dataAddress: "",

@@ -88,7 +88,6 @@ export default function Card({ item }) {
     }, 5000);
   };
 
-  console.log(snmpResults, "snmpResult");
   return (
     <>
       <div className="bg-background-box py-3 px-4 w-full rounded-xs">

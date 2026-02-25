@@ -16,7 +16,6 @@ export default function Monitoring() {
     if (token) getList();
   }, [token]);
 
-  console.log(zoneList);
 
   
   if (loading) return <div>loading...</div>;
