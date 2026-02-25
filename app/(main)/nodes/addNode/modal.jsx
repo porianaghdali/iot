@@ -154,8 +154,9 @@ export default function AddDeviceModal({
   // -------------------------
   // ذخیره همه سنسورها در بک‌اند
   // -------------------------
-  const handleSaveAllSensors = async () => {
-    if (!formData.ID || !combinedSensors.length) return;
+  const handleSaveAllSensors = async () => {console.log(combinedSensors,formData.ID)
+     if ( !combinedSensors.length) return;
+  
 
     await createMultipleSensor(formData.ID, combinedSensors);
   };
@@ -182,7 +183,7 @@ export default function AddDeviceModal({
       />
     ),
   };
-
+console.log(combinedSensors,"combinedSensors")
   if (!open) return null;
 
   return (

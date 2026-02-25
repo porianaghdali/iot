@@ -81,7 +81,7 @@ export default function StepTwo({ formData, handleChange }) {
         MB_Addresstype: formData.config.addressType || "Register",
       };
     }
-
+console.log(payload,"payload")
     publish(pullTopic, JSON.stringify(payload));
 
     setTimeout(() => {
